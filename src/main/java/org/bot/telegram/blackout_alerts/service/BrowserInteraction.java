@@ -34,7 +34,7 @@ public class BrowserInteraction {
         String city = inputs[0];
         String street = inputs[1];
 
-        WebDriverWait await = new WebDriverWait(driver, Duration.ofSeconds(30));
+        WebDriverWait await = new WebDriverWait(driver, Duration.ofSeconds(15));
 
         WebElement inputCity = await.until(visibilityOfElementLocated(By.xpath(XPATH_INPUT_CITY)));
         inputCity.click();
