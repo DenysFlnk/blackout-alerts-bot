@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bot.telegram.blackout_alerts.model.session.SessionState;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.bot.telegram.blackout_alerts.service.TelegramService;
+import org.bot.telegram.blackout_alerts.service.UserSessionService;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
@@ -17,10 +18,13 @@ public class EnterAddressHandler implements Handler {
 
     private final TelegramService telegramService;
 
+    private final UserSessionService userSessionService;
+
     private final Set<SessionState> allowedStates = new HashSet<>();
 
-    public EnterAddressHandler(TelegramService telegramService) {
+    public EnterAddressHandler(TelegramService telegramService, UserSessionService userSessionService) {
         this.telegramService = telegramService;
+        this.userSessionService = userSessionService;
 
         allowedStates.add(SessionState.WAIT_FOR_CITY);
         allowedStates.add(SessionState.WAIT_FOR_STREET);
@@ -35,11 +39,14 @@ public class EnterAddressHandler implements Handler {
     @Override
     public void handle(UserSession userSession) {
         log.info("EnterAddressHandler.handle()");
-        log.info("Current session state: {}, text: {}", userSession.getSessionState(), userSession.getText());
+        log.info("Chat id: {}, session state: {}, text: {}", userSession.getChatId(), userSession.getSessionState(),
+            userSession.getText());
+
         if (ENTER_ADDRESS.equals(userSession.getText())) {
             log.info("Found /enter_address command");
             telegramService.sendMessage(getEnterCityMessage(userSession));
             userSession.setSessionState(SessionState.WAIT_FOR_CITY);
+            userSessionService.saveUserSession(userSession);
             return;
         }
 
@@ -62,28 +69,30 @@ public class EnterAddressHandler implements Handler {
                 log.info("Address acquired: {}, {}, {}", userSession.getUserCity(), userSession.getUserStreet(),
                     userSession.getUserHouse());
             }
+            default -> throw new IllegalStateException("Unexpected session state: " + userSession.getSessionState());
         }
 
         telegramService.sendMessage(message);
+        userSessionService.saveUserSession(userSession);
     }
 
     private SendMessage getEnterCityMessage(UserSession userSession) {
         return SendMessage.builder()
-            .text("Введіть назву Вашого міста. Наприклад - Київ")
+            .text("Введіть назву міста, наприклад - Київ")
             .chatId(userSession.getChatId())
             .build();
     }
 
     private SendMessage getEnterStreetMessage(UserSession userSession) {
         return SendMessage.builder()
-            .text("Введіть назву Вашої вулиці. Наприклад - Хрещатик")
+            .text("Введіть назву вулиці, наприклад - Хрещатик")
             .chatId(userSession.getChatId())
             .build();
     }
 
     private SendMessage getEnterHouseMessage(UserSession userSession) {
         return SendMessage.builder()
-            .text("Введіть номер Вашого будинку. Наприклад - 23б")
+            .text("Введіть номер Вашого будинку, наприклад - 23б")
             .chatId(userSession.getChatId())
             .build();
     }
@@ -92,7 +101,9 @@ public class EnterAddressHandler implements Handler {
         return SendMessage.builder()
             .text("""
                 Адреса успішно збережена!
-                Натисніть кнопку "Отримати графік на сьогодні", щоб подивитись графік відключень за Вашою адресою""")
+                Натисніть кнопку "Отримати графік на сьогодні", щоб подивитись графік відключень за Вашою адресою або
+                "Змінити адресу" для зміни введеної адреси
+                """)
             .chatId(userSession.getChatId())
             .build();
     }

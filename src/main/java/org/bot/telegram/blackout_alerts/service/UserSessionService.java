@@ -12,9 +12,11 @@ public class UserSessionService {
 
     private final Map<Long, UserSession> userSessions = new HashMap<>();
 
-    public UserSession getUserSession(Update update) {
+    public UserSession getOrCreateUserSession(Update update) {
         long chatId = update.getMessage().getChatId();
-        return userSessions.getOrDefault(chatId, new UserSession(chatId));
+        UserSession session = userSessions.getOrDefault(chatId, new UserSession(chatId));
+        session.setText(update.getMessage().getText());
+        return session;
     }
 
     public void saveUserSession(UserSession userSession) {

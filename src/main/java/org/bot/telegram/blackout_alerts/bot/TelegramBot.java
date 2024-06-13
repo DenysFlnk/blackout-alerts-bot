@@ -14,9 +14,9 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Value("${bot.name}")
     private String botName;
 
-    private MessageDispatcher dispatcher;
+    private final MessageDispatcher dispatcher;
 
-    private UserSessionService userSessionService;
+    private final UserSessionService userSessionService;
 
     public TelegramBot(@Value("${bot.token}") String botToken, MessageDispatcher dispatcher,
                        UserSessionService userSessionService) {
@@ -28,7 +28,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
-            UserSession userSession = userSessionService.getUserSession(update);
+            UserSession userSession = userSessionService.getOrCreateUserSession(update);
             dispatcher.dispatch(userSession);
         }
     }
