@@ -1,7 +1,6 @@
 package org.bot.telegram.blackout_alerts.model.json;
 
 import com.google.gson.annotations.SerializedName;
-import org.bot.telegram.blackout_alerts.service.BrowserInteraction.Group;
 
 public class ShutDownSchedule {
 
