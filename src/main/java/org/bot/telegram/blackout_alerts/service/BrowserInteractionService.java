@@ -3,7 +3,6 @@ package org.bot.telegram.blackout_alerts.service;
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
 import com.google.gson.Gson;
-import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import java.time.Duration;
 import org.bot.telegram.blackout_alerts.model.json.ShutDownSchedule;
@@ -13,8 +12,10 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.stereotype.Service;
 
-public class BrowserInteraction {
+@Service
+public class BrowserInteractionService {
 
     private static final String DTEK_URL = "https://www.dtek-krem.com.ua/ua/shutdowns";
 

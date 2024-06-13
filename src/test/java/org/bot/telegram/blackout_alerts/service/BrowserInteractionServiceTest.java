@@ -1,16 +1,14 @@
 package org.bot.telegram.blackout_alerts.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.Test;
 
-class BrowserInteractionTest {
+class BrowserInteractionServiceTest {
 
     @Test
     void getShutDownSchedule() {
         String[] input = new String[] {"Ірпінь", "Університетська"};
-        BrowserInteraction browserInteraction = new BrowserInteraction();
+        BrowserInteractionService browserInteractionService = new BrowserInteractionService();
 
-        browserInteraction.getShutDownSchedule(input);
+        browserInteractionService.getShutDownSchedule(input);
     }
 }
