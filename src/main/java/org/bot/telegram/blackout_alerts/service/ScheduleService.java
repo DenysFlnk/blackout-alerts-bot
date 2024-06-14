@@ -43,7 +43,7 @@ public class ScheduleService {
 
     public String renderTodaySchedule(Schedule schedule) {
         DayOfWeek today = LocalDate.now().getDayOfWeek();
-        List<Pair<String, Possibility>> currentDayPossibilities = schedule.getSchedule().get(today);
+        List<Pair<String, Possibility>> currentDayPossibilities = schedule.getWeekListMap().get(today);
         List<String> headerList = Arrays.asList("Часовий інтервал (год)", "Можливість відкючення");
         List<List<String>> rowList = currentDayPossibilities.stream()
             .map(pair -> Arrays.asList(pair.getFirst(), pair.getSecond().toString()))
@@ -89,7 +89,7 @@ public class ScheduleService {
         TimeZone sunday = shutdownGroup.getSunday();
         map.put(DayOfWeek.MONDAY, getListOfPossibilitiesForADay(sunday));
 
-        schedule.setSchedule(map);
+        schedule.setWeekListMap(map);
 
         return schedule;
     }
