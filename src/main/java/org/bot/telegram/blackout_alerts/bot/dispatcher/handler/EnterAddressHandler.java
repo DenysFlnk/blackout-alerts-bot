@@ -12,19 +12,14 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 @Component
 @Slf4j
-public class EnterAddressHandler implements Handler {
+public class EnterAddressHandler extends AbstractHandler {
 
     private static final String ENTER_ADDRESS = "/enter_address";
-
-    private final TelegramService telegramService;
-
-    private final UserSessionService userSessionService;
 
     private final Set<SessionState> allowedStates = new HashSet<>();
 
     public EnterAddressHandler(TelegramService telegramService, UserSessionService userSessionService) {
-        this.telegramService = telegramService;
-        this.userSessionService = userSessionService;
+        super(telegramService, userSessionService);
 
         allowedStates.add(SessionState.WAIT_FOR_CITY);
         allowedStates.add(SessionState.WAIT_FOR_STREET);

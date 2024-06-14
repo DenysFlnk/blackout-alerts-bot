@@ -1,6 +1,7 @@
 package org.bot.telegram.blackout_alerts.model.session;
 
 import lombok.Data;
+import org.bot.telegram.blackout_alerts.model.schedule.Schedule;
 
 @Data
 public class UserSession {
@@ -16,4 +17,8 @@ public class UserSession {
     private String userStreet;
 
     private String userHouse;
+
+    private byte shutdownGroup;
+
+    private Schedule schedule;
 }

@@ -12,4 +12,22 @@ public class ShutDownSchedule {
     Group group3;
     @SerializedName("4")
     Group group4;
+
+    public Group getGroup(int groupNumber) {
+        switch (groupNumber) {
+            case 1 -> {
+                return group1;
+            }
+            case 2 -> {
+                return group2;
+            }
+            case 3 -> {
+                return group3;
+            }
+            case 4 -> {
+                return group4;
+            }
+            default -> throw new IllegalArgumentException("Invalid group number");
+        }
+    }
 }
