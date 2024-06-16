@@ -1,23 +1,24 @@
 package org.bot.telegram.blackout_alerts.service;
 
-import static org.bot.telegram.blackout_alerts.model.schedule.Possibility.*;
+import static org.bot.telegram.blackout_alerts.model.schedule.Possibility.valueOf;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
-import org.bot.telegram.blackout_alerts.model.schedule.Possibility;
-import org.bot.telegram.blackout_alerts.model.schedule.Schedule;
 import org.bot.telegram.blackout_alerts.model.json.Group;
 import org.bot.telegram.blackout_alerts.model.json.ShutDownSchedule;
 import org.bot.telegram.blackout_alerts.model.json.TimeZone;
+import org.bot.telegram.blackout_alerts.model.schedule.Possibility;
+import org.bot.telegram.blackout_alerts.model.schedule.Schedule;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import wagu.Block;
 import wagu.Board;
 import wagu.Table;
 
@@ -44,17 +45,18 @@ public class ScheduleService {
     public String renderTodaySchedule(Schedule schedule) {
         DayOfWeek today = LocalDate.now().getDayOfWeek();
         List<Pair<String, Possibility>> currentDayPossibilities = schedule.getWeekListMap().get(today);
-        List<String> headerList = Arrays.asList("Часовий інтервал (год)", "Можливість відкючення");
+        List<String> headerList = Arrays.asList("Час", "Відключення");
         List<List<String>> rowList = currentDayPossibilities.stream()
             .map(pair -> Arrays.asList(pair.getFirst(), pair.getSecond().toString()))
             .toList();
 
-        Board board = new Board(75);
-        Table table = new Table(board, 75, headerList, rowList);
+        Board board = new Board(30);
+        Table table = new Table(board, 30, headerList, rowList);
+        table.setColAlignsList(Arrays.asList(Block.DATA_CENTER, Block.DATA_CENTER));
         board.setInitialBlock(table.tableToBlocks());
         board.build();
 
-        return board.getPreview();
+        return String.format("<pre>%s</pre>", board.getPreview());
     }
 
     private static boolean isScheduleExpired(Schedule schedule) {
@@ -66,7 +68,7 @@ public class ScheduleService {
         schedule.setExpireDate(getScheduleExpireDate());
 
         Group shutdownGroup = shutDownSchedule.getGroup(userSession.getShutdownGroup());
-        Map<DayOfWeek, List<Pair<String, Possibility>>> map = new HashMap<>();
+        Map<DayOfWeek, List<Pair<String, Possibility>>> map = new LinkedHashMap<>();
 
         TimeZone monday = shutdownGroup.getMonday();
         map.put(DayOfWeek.MONDAY, getListOfPossibilitiesForADay(monday));
@@ -75,19 +77,19 @@ public class ScheduleService {
         map.put(DayOfWeek.TUESDAY, getListOfPossibilitiesForADay(tuesday));
 
         TimeZone wednesday = shutdownGroup.getWednesday();
-        map.put(DayOfWeek.MONDAY, getListOfPossibilitiesForADay(wednesday));
+        map.put(DayOfWeek.WEDNESDAY, getListOfPossibilitiesForADay(wednesday));
 
         TimeZone thursday = shutdownGroup.getThursday();
-        map.put(DayOfWeek.MONDAY, getListOfPossibilitiesForADay(thursday));
+        map.put(DayOfWeek.THURSDAY, getListOfPossibilitiesForADay(thursday));
 
         TimeZone friday = shutdownGroup.getFriday();
-        map.put(DayOfWeek.MONDAY, getListOfPossibilitiesForADay(friday));
+        map.put(DayOfWeek.FRIDAY, getListOfPossibilitiesForADay(friday));
 
         TimeZone saturday = shutdownGroup.getSaturday();
-        map.put(DayOfWeek.MONDAY, getListOfPossibilitiesForADay(saturday));
+        map.put(DayOfWeek.SATURDAY, getListOfPossibilitiesForADay(saturday));
 
         TimeZone sunday = shutdownGroup.getSunday();
-        map.put(DayOfWeek.MONDAY, getListOfPossibilitiesForADay(sunday));
+        map.put(DayOfWeek.SUNDAY, getListOfPossibilitiesForADay(sunday));
 
         schedule.setWeekListMap(map);
 

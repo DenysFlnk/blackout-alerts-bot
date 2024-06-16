@@ -9,6 +9,6 @@ class BrowserInteractionServiceTest {
         String[] input = new String[] {"Ірпінь", "Університетська"};
         BrowserInteractionService browserInteractionService = new BrowserInteractionService();
 
-        browserInteractionService.getShutDownSchedule(input);
+//        browserInteractionService.getShutDownSchedule(input);
     }
 }

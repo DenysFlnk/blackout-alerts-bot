@@ -71,28 +71,28 @@ public class EnterAddressHandler extends AbstractHandler {
         userSessionService.saveUserSession(userSession);
     }
 
-    private SendMessage getEnterCityMessage(UserSession userSession) {
+    protected static SendMessage getEnterCityMessage(UserSession userSession) {
         return SendMessage.builder()
             .text("Введіть назву міста, наприклад - Київ")
             .chatId(userSession.getChatId())
             .build();
     }
 
-    private SendMessage getEnterStreetMessage(UserSession userSession) {
+    private static SendMessage getEnterStreetMessage(UserSession userSession) {
         return SendMessage.builder()
             .text("Введіть назву вулиці, наприклад - Хрещатик")
             .chatId(userSession.getChatId())
             .build();
     }
 
-    private SendMessage getEnterHouseMessage(UserSession userSession) {
+    private static SendMessage getEnterHouseMessage(UserSession userSession) {
         return SendMessage.builder()
             .text("Введіть номер Вашого будинку, наприклад - 23б")
             .chatId(userSession.getChatId())
             .build();
     }
 
-    private SendMessage getAddressAcquiredMessage(UserSession userSession) {
+    private static SendMessage getAddressAcquiredMessage(UserSession userSession) {
         return SendMessage.builder()
             .text("""
                 Адреса успішно збережена!
