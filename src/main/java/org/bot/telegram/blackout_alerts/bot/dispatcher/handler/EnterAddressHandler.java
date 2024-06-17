@@ -1,14 +1,20 @@
 package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.bot.telegram.blackout_alerts.model.session.SessionState;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.bot.telegram.blackout_alerts.service.TelegramService;
 import org.bot.telegram.blackout_alerts.service.UserSessionService;
+import org.bot.telegram.blackout_alerts.util.KeyboardBuilder;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 @Component
 @Slf4j
@@ -45,7 +51,7 @@ public class EnterAddressHandler extends AbstractHandler {
             return;
         }
 
-        SendMessage message = null;
+        SendMessage message;
         switch (userSession.getSessionState()) {
             case WAIT_FOR_CITY -> {
                 userSession.setUserCity(userSession.getText());
@@ -87,19 +93,25 @@ public class EnterAddressHandler extends AbstractHandler {
 
     private static SendMessage getEnterHouseMessage(UserSession userSession) {
         return SendMessage.builder()
-            .text("Введіть номер Вашого будинку, наприклад - 23б")
+            .text("Введіть номер будинку, наприклад - 23б")
             .chatId(userSession.getChatId())
             .build();
     }
 
-    private static SendMessage getAddressAcquiredMessage(UserSession userSession) {
+    private SendMessage getAddressAcquiredMessage(UserSession userSession) {
+        InlineKeyboardMarkup keyboard = KeyboardBuilder.builder()
+            .addShowScheduleButton()
+            .addChangeAddressButton()
+            .build();
+
         return SendMessage.builder()
             .text("""
                 Адреса успішно збережена!
-                Натисніть кнопку "Отримати графік на сьогодні", щоб подивитись графік відключень за Вашою адресою або
+                Натисніть кнопку "Отримати графік на сьогодні", щоб подивитись графік відключень за збереженою адресою або
                 "Змінити адресу" для зміни введеної адреси
                 """)
             .chatId(userSession.getChatId())
+            .replyMarkup(keyboard)
             .build();
     }
 }

@@ -6,7 +6,7 @@ import org.bot.telegram.blackout_alerts.model.schedule.Schedule;
 @Data
 public class UserSession {
 
-    private final Long chatId;
+    private final long chatId;
 
     private SessionState sessionState = SessionState.START;
 
