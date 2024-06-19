@@ -56,7 +56,7 @@ public class ScheduleService {
         board.setInitialBlock(table.tableToBlocks());
         board.build();
 
-        return String.format("<pre>%s</pre>", board.getPreview());
+        return String.format("<pre>          %s%n%s</pre>", LocalDate.now(), board.getPreview());
     }
 
     private static boolean isScheduleExpired(Schedule schedule) {

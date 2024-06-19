@@ -55,7 +55,20 @@ public class TodayScheduleHandler extends AbstractHandler {
             return;
         }
 
-        String schedule = scheduleService.getRenderedTodaySchedule(userSession);
+        String schedule;
+        try {
+            schedule = scheduleService.getRenderedTodaySchedule(userSession);
+        } catch (RuntimeException e) {
+            log.error("Invalid address.");
+
+            SendMessage sendMessage = SendMessage.builder()
+                .chatId(userSession.getChatId())
+                .text(e.getMessage())
+                .replyMarkup(KeyboardBuilder.builder().addEnterAddressButton().build())
+                .build();
+            telegramService.sendMessage(sendMessage);
+            return;
+        }
 
         SendMessage sendMessage = SendMessage.builder()
             .chatId(userSession.getChatId())
