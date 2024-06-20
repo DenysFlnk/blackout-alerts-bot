@@ -18,6 +18,7 @@ import org.bot.telegram.blackout_alerts.model.json.TimeZone;
 import org.bot.telegram.blackout_alerts.model.schedule.Possibility;
 import org.bot.telegram.blackout_alerts.model.schedule.Schedule;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
+import org.bot.telegram.blackout_alerts.service.browser.BrowserInteractionService;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import wagu.Block;

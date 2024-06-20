@@ -31,14 +31,14 @@ public class UserSession {
     }
 
     public String getUserCity() {
-        return address.getCity();
+        return address != null ? address.getCity() : null;
     }
 
     public String getUserStreet() {
-        return address.getStreet();
+        return address != null ? address.getStreet() : null;
     }
 
     public String getUserHouse() {
-        return address.getHouse();
+        return address != null ? address.getHouse() : null;
     }
 }

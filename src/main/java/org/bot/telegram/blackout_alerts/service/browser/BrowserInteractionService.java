@@ -1,63 +1,65 @@
-package org.bot.telegram.blackout_alerts.service;
+package org.bot.telegram.blackout_alerts.service.browser;
 
+import static org.bot.telegram.blackout_alerts.service.browser.WebDriverHelper.KYIV;
+import static org.bot.telegram.blackout_alerts.service.browser.WebDriverHelper.acquireWebDriverWithAwaits;
+import static org.bot.telegram.blackout_alerts.service.browser.WebDriverHelper.releaseWebDriverWithAwaits;
+import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.JS_GET_GROUP;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.JS_GET_SCHEDULE;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_CITY_AUTOCOMPLETE;
-import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_GROUP_CONTAINER;
-import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_AUTOCOMPLETE;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_CITY_INPUT;
+import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_AUTOCOMPLETE;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_INPUT;
-import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_INPUT;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_AUTOCOMPLETE;
+import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_INPUT;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.dtekPageIsReady;
-import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.parseGroupNumber;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.vdurmont.emoji.EmojiParser;
 import java.time.Duration;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.bot.telegram.blackout_alerts.model.json.ShutDownSchedule;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
+@Setter
+@Getter
 public class BrowserInteractionService {
 
-    private final WebDriver driver;
+    private WebDriver driver;
 
-    private final WebDriverWait pageAwait;
+    private WebDriverWait pageAwait;
 
-    private final WebDriverWait autocompleteAwait;
-
-    public BrowserInteractionService(WebDriver driver, @Qualifier("pageAwait") WebDriverWait pageAwait,
-                                     @Qualifier("autocompleteAwait") WebDriverWait autocompleteAwait) {
-        this.driver = driver;
-        this.pageAwait = pageAwait;
-        this.autocompleteAwait = autocompleteAwait;
-    }
+    private WebDriverWait autocompleteAwait;
 
     public ShutDownSchedule getShutDownSchedule(UserSession userSession) {
+        acquireWebDriverWithAwaits(this, userSession.getUserCity());
         awaitForDtekPage();
 
-        fillCityInput(userSession);
+        if (!userSession.getUserCity().equals(KYIV)) {
+            fillCityInput(userSession);
+        }
+
         fillStreetInput(userSession);
         fillHouseInput(userSession);
 
-        setShutdownGroup(userSession);
+        setShutdownGroupByJS(userSession);
+        ShutDownSchedule schedule = getScheduleByJS();
 
-        return getScheduleByJS();
+        releaseWebDriverWithAwaits(this);
+        return schedule;
     }
 
     private void awaitForDtekPage() {
@@ -144,12 +146,6 @@ public class BrowserInteractionService {
         actions.perform();
     }
 
-    private void setShutdownGroup(UserSession userSession) {
-        WebElement groupElement = pageAwait.until(visibilityOfElementLocated(By.xpath(XPATH_GROUP_CONTAINER)));
-        byte groupNumber = parseGroupNumber(groupElement.getText());
-        userSession.setShutdownGroup(groupNumber);
-    }
-
     private String getAutocompleteInput(WebElement input, String autocompleteXpath, String value) {
         StringBuilder modValue = new StringBuilder(value);
 
@@ -178,6 +174,11 @@ public class BrowserInteractionService {
         }
 
         return autocompleteValue;
+    }
+
+    private void setShutdownGroupByJS(UserSession userSession) {
+        String json = (String) ((JavascriptExecutor) driver).executeScript(JS_GET_GROUP);
+        userSession.setShutdownGroup(Byte.parseByte(json));
     }
 
     private ShutDownSchedule getScheduleByJS() {
