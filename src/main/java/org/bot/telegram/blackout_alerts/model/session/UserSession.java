@@ -12,13 +12,33 @@ public class UserSession {
 
     private String text;
 
-    private String userCity;
-
-    private String userStreet;
-
-    private String userHouse;
+    private Address address;
 
     private byte shutdownGroup;
 
     private Schedule schedule;
+
+    public void setUserCity(String city) {
+        address.setCity(city);
+    }
+
+    public void setUserStreet(String street) {
+        address.setStreet(street);
+    }
+
+    public void setUserHouse(String house) {
+        address.setHouse(house);
+    }
+
+    public String getUserCity() {
+        return address.getCity();
+    }
+
+    public String getUserStreet() {
+        return address.getStreet();
+    }
+
+    public String getUserHouse() {
+        return address.getHouse();
+    }
 }

@@ -39,20 +39,23 @@ public class ScheduleService {
     private final BrowserInteractionService browserService;
 
     public String getRenderedTodaySchedule(UserSession userSession) {
-        Schedule schedule = userSession.getSchedule();
-
-        if (schedule != null && !isScheduleExpired(schedule)) {
-            return renderTodaySchedule(schedule);
+        if (isScheduleValid(userSession)) {
+            return renderTodaySchedule(userSession.getSchedule());
         }
 
         ShutDownSchedule shutDownSchedule = browserService.getShutDownSchedule(userSession);
-        schedule = parseSchedule(userSession, shutDownSchedule);
+        Schedule schedule = parseSchedule(userSession, shutDownSchedule);
         userSession.setSchedule(schedule);
 
         return renderTodaySchedule(schedule);
     }
 
-    public String renderTodaySchedule(Schedule schedule) {
+    private static boolean isScheduleValid(UserSession userSession) {
+        Schedule schedule = userSession.getSchedule();
+        return schedule != null && !isScheduleExpired(schedule) && schedule.getAddress().equals(userSession.getAddress());
+    }
+
+    private String renderTodaySchedule(Schedule schedule) {
         DayOfWeek today = LocalDate.now().getDayOfWeek();
         List<Pair<String, String>> currentDayPossibilities = schedule.getWeekListMap().get(today);
         List<String> headerList = Arrays.asList(parseToUnicode(":clock5:"), parseToUnicode(":bulb:"));
@@ -81,7 +84,7 @@ public class ScheduleService {
     }
 
     private static Schedule parseSchedule(UserSession userSession, ShutDownSchedule shutDownSchedule) {
-        Schedule schedule = new Schedule(userSession.getChatId());
+        Schedule schedule = new Schedule(userSession.getChatId(), userSession.getAddress());
         schedule.setExpireDate(getScheduleExpireDate());
 
         Group shutdownGroup = shutDownSchedule.getGroup(userSession.getShutdownGroup());

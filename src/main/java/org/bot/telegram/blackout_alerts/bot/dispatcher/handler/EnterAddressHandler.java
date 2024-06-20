@@ -4,6 +4,7 @@ import com.vdurmont.emoji.EmojiParser;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import org.bot.telegram.blackout_alerts.model.session.Address;
 import org.bot.telegram.blackout_alerts.model.session.SessionState;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.bot.telegram.blackout_alerts.service.TelegramService;
@@ -44,7 +45,10 @@ public class EnterAddressHandler extends AbstractHandler {
         if (ENTER_ADDRESS.equals(userSession.getText())) {
             log.info("Found /enter_address command");
             telegramService.sendMessage(getEnterCityMessage(userSession));
+
             userSession.setSessionState(SessionState.WAIT_FOR_CITY);
+            userSession.setAddress(new Address());
+
             userSessionService.saveUserSession(userSession);
             return;
         }
@@ -57,7 +61,8 @@ public class EnterAddressHandler extends AbstractHandler {
                 userSession.setSessionState(SessionState.WAIT_FOR_STREET);
             }
             case WAIT_FOR_STREET -> {
-                userSession.setUserStreet(userSession.getText());
+                String street = UserSessionUtil.parseStreet(userSession.getText());
+                userSession.setUserStreet(street);
                 message = getEnterHouseMessage(userSession);
                 userSession.setSessionState(SessionState.WAIT_FOR_HOUSE_NUMBER);
             }

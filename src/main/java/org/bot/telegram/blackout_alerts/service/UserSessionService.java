@@ -3,6 +3,7 @@ package org.bot.telegram.blackout_alerts.service;
 import java.util.HashMap;
 import java.util.Map;
 import org.bot.telegram.blackout_alerts.bot.TelegramBot;
+import org.bot.telegram.blackout_alerts.model.session.Address;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
