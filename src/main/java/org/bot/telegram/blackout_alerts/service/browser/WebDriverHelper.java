@@ -4,6 +4,7 @@ import java.time.Duration;
 import org.bot.telegram.blackout_alerts.util.BrowserPageUtil;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class WebDriverHelper {
@@ -36,7 +37,10 @@ public class WebDriverHelper {
     }
 
     private static WebDriver getDriver() {
-        return new ChromeDriver();
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless=new");
+
+        return new ChromeDriver(options);
     }
 
     private static WebDriverWait getPageAwait(WebDriver driver) {
