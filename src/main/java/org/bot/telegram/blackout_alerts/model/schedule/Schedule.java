@@ -14,5 +14,5 @@ public class Schedule {
 
     private LocalDate expireDate;
 
-    private Map<DayOfWeek, List<Pair<String, Possibility>>> weekListMap;
+    private Map<DayOfWeek, List<Pair<String, String>>> weekListMap;
 }

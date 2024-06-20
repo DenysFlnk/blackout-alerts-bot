@@ -1,11 +1,13 @@
 package org.bot.telegram.blackout_alerts.service;
 
+import static com.vdurmont.emoji.EmojiParser.parseToUnicode;
 import static org.bot.telegram.blackout_alerts.model.schedule.Possibility.valueOf;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,14 @@ import wagu.Table;
 @AllArgsConstructor
 public class ScheduleService {
 
+    private static final Map<Possibility, String> possibilityToEmojiMap = new EnumMap<>(Possibility.class);
+
+    static {
+        possibilityToEmojiMap.put(Possibility.YES, "\uD83D\uDFE2");
+        possibilityToEmojiMap.put(Possibility.NO, "\uD83D\uDD34");
+        possibilityToEmojiMap.put(Possibility.MAYBE, "\uD83D\uDFE1");
+    }
+
     private final BrowserInteractionService browserService;
 
     public String getRenderedTodaySchedule(UserSession userSession) {
@@ -44,19 +54,26 @@ public class ScheduleService {
 
     public String renderTodaySchedule(Schedule schedule) {
         DayOfWeek today = LocalDate.now().getDayOfWeek();
-        List<Pair<String, Possibility>> currentDayPossibilities = schedule.getWeekListMap().get(today);
-        List<String> headerList = Arrays.asList("Час", "Відключення");
+        List<Pair<String, String>> currentDayPossibilities = schedule.getWeekListMap().get(today);
+        List<String> headerList = Arrays.asList(parseToUnicode(":clock5:"), parseToUnicode(":bulb:"));
         List<List<String>> rowList = currentDayPossibilities.stream()
-            .map(pair -> Arrays.asList(pair.getFirst(), pair.getSecond().toString()))
+            .map(pair -> Arrays.asList(pair.getFirst(), pair.getSecond()))
             .toList();
 
         Board board = new Board(30);
         Table table = new Table(board, 30, headerList, rowList);
         table.setColAlignsList(Arrays.asList(Block.DATA_CENTER, Block.DATA_CENTER));
+        table.setRowHeight(120);
         board.setInitialBlock(table.tableToBlocks());
         board.build();
 
-        return String.format("<pre>          %s%n%s</pre>", LocalDate.now(), board.getPreview());
+        return String.format("""
+            <pre>          %s
+            %s
+            \uD83D\uDFE2 - світло є
+            \uD83D\uDD34 - світло відсутнє
+            \uD83D\uDFE1 - можливе відключення
+            </pre>""", LocalDate.now(), board.getPreview());
     }
 
     private static boolean isScheduleExpired(Schedule schedule) {
@@ -68,7 +85,7 @@ public class ScheduleService {
         schedule.setExpireDate(getScheduleExpireDate());
 
         Group shutdownGroup = shutDownSchedule.getGroup(userSession.getShutdownGroup());
-        Map<DayOfWeek, List<Pair<String, Possibility>>> map = new LinkedHashMap<>();
+        Map<DayOfWeek, List<Pair<String, String>>> map = new LinkedHashMap<>();
 
         TimeZone monday = shutdownGroup.getMonday();
         map.put(DayOfWeek.MONDAY, getListOfPossibilitiesForADay(monday));
@@ -100,34 +117,39 @@ public class ScheduleService {
         return LocalDate.now().plusDays(7);
     }
 
-    private static List<Pair<String, Possibility>> getListOfPossibilitiesForADay(TimeZone timeZone) {
-        List<Pair<String, Possibility>> possibilities = new ArrayList<>();
+    private static List<Pair<String, String>> getListOfPossibilitiesForADay(TimeZone timeZone) {
+        List<Pair<String, String>> possibilities = new ArrayList<>();
 
-        possibilities.add(Pair.of("00-01", valueOf(timeZone.getT00_01().toUpperCase())));
-        possibilities.add(Pair.of("01-02", valueOf(timeZone.getT01_02().toUpperCase())));
-        possibilities.add(Pair.of("02-03", valueOf(timeZone.getT02_03().toUpperCase())));
-        possibilities.add(Pair.of("03-04", valueOf(timeZone.getT03_04().toUpperCase())));
-        possibilities.add(Pair.of("04-05", valueOf(timeZone.getT04_05().toUpperCase())));
-        possibilities.add(Pair.of("05-06", valueOf(timeZone.getT05_06().toUpperCase())));
-        possibilities.add(Pair.of("06-07", valueOf(timeZone.getT06_07().toUpperCase())));
-        possibilities.add(Pair.of("07-08", valueOf(timeZone.getT07_08().toUpperCase())));
-        possibilities.add(Pair.of("08-09", valueOf(timeZone.getT08_09().toUpperCase())));
-        possibilities.add(Pair.of("09-10", valueOf(timeZone.getT09_10().toUpperCase())));
-        possibilities.add(Pair.of("10-11", valueOf(timeZone.getT10_11().toUpperCase())));
-        possibilities.add(Pair.of("11-12", valueOf(timeZone.getT11_12().toUpperCase())));
-        possibilities.add(Pair.of("12-13", valueOf(timeZone.getT12_13().toUpperCase())));
-        possibilities.add(Pair.of("13-14", valueOf(timeZone.getT13_14().toUpperCase())));
-        possibilities.add(Pair.of("14-15", valueOf(timeZone.getT14_15().toUpperCase())));
-        possibilities.add(Pair.of("15-16", valueOf(timeZone.getT15_16().toUpperCase())));
-        possibilities.add(Pair.of("16-17", valueOf(timeZone.getT16_17().toUpperCase())));
-        possibilities.add(Pair.of("17-18", valueOf(timeZone.getT17_18().toUpperCase())));
-        possibilities.add(Pair.of("18-19", valueOf(timeZone.getT18_19().toUpperCase())));
-        possibilities.add(Pair.of("19-20", valueOf(timeZone.getT19_20().toUpperCase())));
-        possibilities.add(Pair.of("20-21", valueOf(timeZone.getT20_21().toUpperCase())));
-        possibilities.add(Pair.of("21-22", valueOf(timeZone.getT21_22().toUpperCase())));
-        possibilities.add(Pair.of("22-23", valueOf(timeZone.getT22_23().toUpperCase())));
-        possibilities.add(Pair.of("23-24", valueOf(timeZone.getT23_24().toUpperCase())));
+        possibilities.add(Pair.of("00-01", getPossibilityEmoji(timeZone.getT00_01())));
+        possibilities.add(Pair.of("01-02", getPossibilityEmoji(timeZone.getT01_02())));
+        possibilities.add(Pair.of("02-03", getPossibilityEmoji(timeZone.getT02_03())));
+        possibilities.add(Pair.of("03-04", getPossibilityEmoji(timeZone.getT03_04())));
+        possibilities.add(Pair.of("04-05", getPossibilityEmoji(timeZone.getT04_05())));
+        possibilities.add(Pair.of("05-06", getPossibilityEmoji(timeZone.getT05_06())));
+        possibilities.add(Pair.of("06-07", getPossibilityEmoji(timeZone.getT06_07())));
+        possibilities.add(Pair.of("07-08", getPossibilityEmoji(timeZone.getT07_08())));
+        possibilities.add(Pair.of("08-09", getPossibilityEmoji(timeZone.getT08_09())));
+        possibilities.add(Pair.of("09-10", getPossibilityEmoji(timeZone.getT09_10())));
+        possibilities.add(Pair.of("10-11", getPossibilityEmoji(timeZone.getT10_11())));
+        possibilities.add(Pair.of("11-12", getPossibilityEmoji(timeZone.getT11_12())));
+        possibilities.add(Pair.of("12-13", getPossibilityEmoji(timeZone.getT12_13())));
+        possibilities.add(Pair.of("13-14", getPossibilityEmoji(timeZone.getT13_14())));
+        possibilities.add(Pair.of("14-15", getPossibilityEmoji(timeZone.getT14_15())));
+        possibilities.add(Pair.of("15-16", getPossibilityEmoji(timeZone.getT15_16())));
+        possibilities.add(Pair.of("16-17", getPossibilityEmoji(timeZone.getT16_17())));
+        possibilities.add(Pair.of("17-18", getPossibilityEmoji(timeZone.getT17_18())));
+        possibilities.add(Pair.of("18-19", getPossibilityEmoji(timeZone.getT18_19())));
+        possibilities.add(Pair.of("19-20", getPossibilityEmoji(timeZone.getT19_20())));
+        possibilities.add(Pair.of("20-21", getPossibilityEmoji(timeZone.getT20_21())));
+        possibilities.add(Pair.of("21-22", getPossibilityEmoji(timeZone.getT21_22())));
+        possibilities.add(Pair.of("22-23", getPossibilityEmoji(timeZone.getT22_23())));
+        possibilities.add(Pair.of("23-24", getPossibilityEmoji(timeZone.getT23_24())));
 
         return possibilities;
+    }
+
+    private static String getPossibilityEmoji(String timeZoneValue) {
+        Possibility possibility = valueOf(timeZoneValue.toUpperCase());
+        return possibilityToEmojiMap.get(possibility);
     }
 }

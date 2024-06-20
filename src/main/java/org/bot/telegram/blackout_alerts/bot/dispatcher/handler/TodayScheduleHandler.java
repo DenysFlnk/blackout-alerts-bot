@@ -1,5 +1,6 @@
 package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 
+import com.vdurmont.emoji.EmojiParser;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,7 +48,7 @@ public class TodayScheduleHandler extends AbstractHandler {
 
             SendMessage sendMessage = SendMessage.builder()
                 .chatId(userSession.getChatId())
-                .text("Необхідно ввести повну адресу для отримання графіку відключень")
+                .text(EmojiParser.parseToUnicode(":exclamation: Необхідно ввести повну адресу для отримання графіку відключень"))
                 .replyMarkup(keyboard)
                 .build();
 

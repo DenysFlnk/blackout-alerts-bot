@@ -1,9 +1,7 @@
 package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import com.vdurmont.emoji.EmojiParser;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.bot.telegram.blackout_alerts.model.session.SessionState;
@@ -11,10 +9,10 @@ import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.bot.telegram.blackout_alerts.service.TelegramService;
 import org.bot.telegram.blackout_alerts.service.UserSessionService;
 import org.bot.telegram.blackout_alerts.util.KeyboardBuilder;
+import org.bot.telegram.blackout_alerts.util.UserSessionUtil;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 @Component
 @Slf4j
@@ -64,7 +62,8 @@ public class EnterAddressHandler extends AbstractHandler {
                 userSession.setSessionState(SessionState.WAIT_FOR_HOUSE_NUMBER);
             }
             case WAIT_FOR_HOUSE_NUMBER -> {
-                userSession.setUserHouse(userSession.getText());
+                String house = UserSessionUtil.parseHouseNumber(userSession.getText());
+                userSession.setUserHouse(house);
                 message = getAddressAcquiredMessage(userSession);
                 userSession.setSessionState(SessionState.ADDRESS_ACQUIRED);
                 log.info("Address acquired: {}, {}, {}", userSession.getUserCity(), userSession.getUserStreet(),
@@ -79,21 +78,21 @@ public class EnterAddressHandler extends AbstractHandler {
 
     protected static SendMessage getEnterCityMessage(UserSession userSession) {
         return SendMessage.builder()
-            .text("Введіть назву міста, наприклад - Київ")
+            .text(EmojiParser.parseToUnicode(":point_right: Введіть назву міста, наприклад - Київ"))
             .chatId(userSession.getChatId())
             .build();
     }
 
     private static SendMessage getEnterStreetMessage(UserSession userSession) {
         return SendMessage.builder()
-            .text("Введіть назву вулиці, наприклад - Хрещатик")
+            .text(EmojiParser.parseToUnicode(":point_right: Введіть назву вулиці, наприклад - Хрещатик"))
             .chatId(userSession.getChatId())
             .build();
     }
 
     private static SendMessage getEnterHouseMessage(UserSession userSession) {
         return SendMessage.builder()
-            .text("Введіть номер будинку, наприклад - 23б")
+            .text(EmojiParser.parseToUnicode(":point_right: Введіть номер будинку, наприклад - 23б"))
             .chatId(userSession.getChatId())
             .build();
     }
@@ -105,11 +104,11 @@ public class EnterAddressHandler extends AbstractHandler {
             .build();
 
         return SendMessage.builder()
-            .text("""
-                Адреса успішно збережена!
-                Натисніть кнопку "Отримати графік на сьогодні", щоб подивитись графік відключень за збереженою адресою або
-                "Змінити адресу" для зміни введеної адреси
-                """)
+            .text(EmojiParser.parseToUnicode("""
+                Адреса успішно збережена :ok_hand:
+                Натисніть кнопку "Отримати графік на сьогодні :bulb:", щоб подивитись графік відключень за збереженою адресою або
+                "Змінити адресу :arrows_counterclockwise:" для зміни введеної адреси
+                """))
             .chatId(userSession.getChatId())
             .replyMarkup(keyboard)
             .build();

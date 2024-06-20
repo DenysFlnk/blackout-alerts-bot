@@ -1,5 +1,6 @@
 package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 
+import com.vdurmont.emoji.EmojiParser;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +31,6 @@ public class StartHandler extends AbstractHandler {
 
     @Override
     public void handle(UserSession userSession) {
-        //TODO change message and buttons based on user session
         log.info("StartHandler.handle()");
         log.info("Chat id: {}, session state: {}, text: {}", userSession.getChatId(), userSession.getSessionState(),
             userSession.getText());
@@ -40,12 +40,13 @@ public class StartHandler extends AbstractHandler {
             .build();
 
         SendMessage sendMessage = SendMessage.builder()
-            .text("""
-                Привіт! Вас вітає Blackout alers Bot!
-                Тут ви можете отримати актуальний графік відключень світла та підписатись на нагадування про відключення.
+            .text(EmojiParser.parseToUnicode("""
+                Привіт! Вас вітає Blackout alers Bot :ua:
                 
-                Для того, щоб почати, натисніть кнопку "Ввести адресу"
-                """)
+                Тут ви можете отримати актуальний графік відключень світла та підписатись на нагадування про відключення :bulb:
+                
+                Для того, щоб почати, натисніть кнопку "Ввести адресу :multiple_houses:"
+                """))
             .chatId(userSession.getChatId())
             .replyMarkup(keyboard)
             .build();

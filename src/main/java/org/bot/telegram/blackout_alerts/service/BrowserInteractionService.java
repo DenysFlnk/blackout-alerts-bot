@@ -14,6 +14,7 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElem
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.vdurmont.emoji.EmojiParser;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.bot.telegram.blackout_alerts.model.json.ShutDownSchedule;
@@ -77,10 +78,10 @@ public class BrowserInteractionService {
         try {
             cityAutocomplete = getAutocompleteInput(input, XPATH_CITY_AUTOCOMPLETE, userCity);
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("""
-                Йой! Схоже, що не правильно введений населений пункт.
-                Натисніть "Ввести адресу", щоб спробувати ще
-                """); //TODO change exception
+            throw new RuntimeException(EmojiParser.parseToUnicode("""
+                Йой! Схоже, що не правильно введений населений пункт :cold_sweat:
+                Натисніть "Ввести адресу", щоб спробувати ще :point_down:
+                """)); //TODO change exception
         }
 
         if (!userCity.equals(cityAutocomplete)) {
@@ -98,10 +99,10 @@ public class BrowserInteractionService {
         try {
             streetAutocomplete = getAutocompleteInput(input, XPATH_STREET_AUTOCOMPLETE, userStreet);
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("""
-                Йой! Схоже, що не правильно введена вулиця.
-                Натисніть "Ввести адресу", щоб спробувати ще
-                """); //TODO change exception
+            throw new RuntimeException(EmojiParser.parseToUnicode("""
+                Йой! Схоже, що не правильно введена вулиця :cold_sweat:
+                Натисніть "Ввести адресу", щоб спробувати ще :point_down:
+                """)); //TODO change exception
         }
 
         if (!userStreet.equals(streetAutocomplete)) {
@@ -119,10 +120,10 @@ public class BrowserInteractionService {
         try {
             houseAutocomplete = getAutocompleteInput(input, XPATH_HOUSE_AUTOCOMPLETE, userHouse);
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("""
-                Йой! Схоже, що не правильно введений номер будинку.
-                Натисніть "Ввести адресу", щоб спробувати ще
-                """); //TODO change exception
+            throw new RuntimeException(EmojiParser.parseToUnicode("""
+                Йой! Схоже, що не правильно введений номер будинку :cold_sweat:
+                Натисніть "Ввести адресу", щоб спробувати ще :point_down:
+                """)); //TODO change exception
         }
 
         if (!userHouse.equals(houseAutocomplete)) {
@@ -137,9 +138,9 @@ public class BrowserInteractionService {
 
         for (int i = 0; i < value.length(); i++) {
             actions.sendKeys(value.subSequence(i, i + 1));
-            actions.pause(Duration.ofMillis(200));
+            actions.pause(Duration.ofMillis(100));
         }
-
+        actions.pause(Duration.ofMillis(300));
         actions.perform();
     }
 

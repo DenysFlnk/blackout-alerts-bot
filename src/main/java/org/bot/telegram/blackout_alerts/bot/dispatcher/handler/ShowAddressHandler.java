@@ -1,5 +1,6 @@
 package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 
+import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
 import org.bot.telegram.blackout_alerts.model.session.SessionState;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
@@ -33,15 +34,7 @@ public class ShowAddressHandler extends AbstractHandler {
         log.info("Chat id: {}, session state: {}, text: {}", userSession.getChatId(), userSession.getSessionState(),
             userSession.getText());
 
-        String city = userSession.getUserCity() != null ? userSession.getUserCity() : "Не вказано";
-        String street = userSession.getUserStreet() != null ? userSession.getUserStreet() : "Не вказано";
-        String house = userSession.getUserHouse() != null ? userSession.getUserHouse() : "Не вказано";
-
-        String message = String.format("""
-            Населенний пункт: %s
-            Вулиця: %s
-            Будинок: %s
-            """, city, street, house);
+        String message = getAddressMessage(userSession);
 
         SendMessageBuilder messageBuilder = SendMessage.builder()
             .chatId(userSession.getChatId())
@@ -55,5 +48,21 @@ public class ShowAddressHandler extends AbstractHandler {
         }
 
         telegramService.sendMessage(messageBuilder.build());
+    }
+
+    private static String getAddressMessage(UserSession userSession) {
+        String noEntry = EmojiParser.parseToUnicode("Не вказано :no_entry_sign:");
+
+        String city = userSession.getUserCity() != null ? userSession.getUserCity() : noEntry;
+        String street = userSession.getUserStreet() != null ? userSession.getUserStreet() : noEntry;
+        String house = userSession.getUserHouse() != null ? userSession.getUserHouse() : noEntry;
+
+        String message = String.format("""
+            :multiple_houses: Населенний пункт :arrow_right: %s
+            :road: Вулиця :arrow_right: %s
+            :house: Будинок :arrow_right: %s
+            """, city, street, house);
+
+        return EmojiParser.parseToUnicode(message);
     }
 }

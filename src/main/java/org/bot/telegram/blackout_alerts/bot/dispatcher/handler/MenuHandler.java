@@ -1,5 +1,6 @@
 package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 
+import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.bot.telegram.blackout_alerts.service.TelegramService;
@@ -38,7 +39,7 @@ public class MenuHandler extends AbstractHandler {
 
         SendMessage message = SendMessage.builder()
             .chatId(userSession.getChatId())
-            .text("Оберіть варіант з наведених нижче:")
+            .text(EmojiParser.parseToUnicode("Оберіть варіант з наведених нижче :arrow_down:"))
             .replyMarkup(menu)
             .build();
 
