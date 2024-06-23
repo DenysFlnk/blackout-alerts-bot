@@ -59,7 +59,9 @@ public class ShowAddressHandler extends AbstractHandler {
 
         String message = String.format("""
             :multiple_houses: Населенний пункт :arrow_right: %s
+            
             :road: Вулиця :arrow_right: %s
+            
             :house: Будинок :arrow_right: %s
             """, city, street, house);
 

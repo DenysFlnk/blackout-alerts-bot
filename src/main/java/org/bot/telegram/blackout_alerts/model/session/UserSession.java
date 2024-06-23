@@ -14,8 +14,6 @@ public class UserSession {
 
     private Address address;
 
-    private byte shutdownGroup;
-
     private Schedule schedule;
 
     public void setUserCity(String city) {
@@ -30,6 +28,10 @@ public class UserSession {
         address.setHouse(house);
     }
 
+    public void setShutdownGroup(byte shutdownGroup) {
+        address.setShutdownGroup(shutdownGroup);
+    }
+
     public String getUserCity() {
         return address != null ? address.getCity() : null;
     }
@@ -40,5 +42,9 @@ public class UserSession {
 
     public String getUserHouse() {
         return address != null ? address.getHouse() : null;
+    }
+
+    public byte getShutdownGroup() {
+        return address.getShutdownGroup();
     }
 }

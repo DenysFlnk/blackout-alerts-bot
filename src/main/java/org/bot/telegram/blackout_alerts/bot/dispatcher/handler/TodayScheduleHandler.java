@@ -54,6 +54,7 @@ public class TodayScheduleHandler extends AbstractHandler {
 
         String schedule;
         try {
+            telegramService.sendMessage(getScheduleLoadingMessage(userSession));
             schedule = scheduleService.getRenderedTodaySchedule(userSession);
         } catch (RuntimeException e) {
             log.error("Invalid address.");
@@ -75,5 +76,15 @@ public class TodayScheduleHandler extends AbstractHandler {
 
         telegramService.sendMessage(sendMessage);
         userSessionService.saveUserSession(userSession);
+    }
+
+    private static SendMessage getScheduleLoadingMessage(UserSession userSession) {
+        return SendMessage.builder()
+            .chatId(userSession.getChatId())
+            .text(EmojiParser.parseToUnicode("""
+                Графік завантажується :sunglasses:
+                
+                Зазвичай це займає декілька секунд :pray:"""))
+            .build();
     }
 }

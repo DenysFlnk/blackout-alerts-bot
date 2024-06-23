@@ -10,4 +10,6 @@ public class Address {
     private String street;
 
     private String house;
+
+    private byte shutdownGroup;
 }

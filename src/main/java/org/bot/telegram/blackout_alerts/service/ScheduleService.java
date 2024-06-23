@@ -40,18 +40,31 @@ public class ScheduleService {
     private final BrowserInteractionService browserService;
 
     public String getRenderedTodaySchedule(UserSession userSession) {
-        if (isScheduleValid(userSession)) {
+        if (isUserScheduleValid(userSession)) {
             return renderTodaySchedule(userSession.getSchedule());
         }
 
-        ShutDownSchedule shutDownSchedule = browserService.getShutDownSchedule(userSession);
-        Schedule schedule = parseSchedule(userSession, shutDownSchedule);
-        userSession.setSchedule(schedule);
+        if (!tryToSetShutdownScheduleFromDb(userSession)) {
+            setShutdownScheduleFromBrowser(userSession);
+        }
 
-        return renderTodaySchedule(schedule);
+        return renderTodaySchedule(userSession.getSchedule());
     }
 
-    private static boolean isScheduleValid(UserSession userSession) {
+    private void setShutdownScheduleFromBrowser(UserSession userSession) {
+        ShutDownSchedule shutDownSchedule = browserService.getShutDownSchedule(userSession);
+        userSession.setSchedule(parseSchedule(userSession, shutDownSchedule));
+    }
+
+    private boolean tryToSetShutdownScheduleFromDb(UserSession userSession) {
+        //get shutdown group from address table
+        //set group
+        //get schedule by group from schedule table
+        //set schedule
+        return false;
+    }
+
+    private static boolean isUserScheduleValid(UserSession userSession) {
         Schedule schedule = userSession.getSchedule();
         return schedule != null && !isScheduleExpired(schedule) && schedule.getAddress().equals(userSession.getAddress());
     }
