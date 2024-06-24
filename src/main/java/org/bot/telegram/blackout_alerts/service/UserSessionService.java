@@ -1,20 +1,22 @@
 package org.bot.telegram.blackout_alerts.service;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Optional;
+import lombok.AllArgsConstructor;
 import org.bot.telegram.blackout_alerts.bot.TelegramBot;
-import org.bot.telegram.blackout_alerts.model.session.Address;
+import org.bot.telegram.blackout_alerts.model.entity.UserInfo;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
+import org.bot.telegram.blackout_alerts.repository.UserInfoRepository;
+import org.bot.telegram.blackout_alerts.util.UserSessionUtil;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-//TODO replace map to actual db storage later
 @Component
+@AllArgsConstructor
 public class UserSessionService {
 
-    private final Map<Long, UserSession> userSessions = new HashMap<>();
+    private final UserInfoRepository userInfoRepository;
 
     public UserSession getOrCreateUserSession(Update update) {
         long chatId;
@@ -29,13 +31,19 @@ public class UserSessionService {
             newText = callback.getData();
         }
 
-        UserSession session = userSessions.getOrDefault(chatId, new UserSession(chatId));
+        UserSession session = getFromDb(chatId).orElse(new UserSession(chatId));
+        saveUserSession(session);
         session.setText(newText);
 
         return session;
     }
 
     public void saveUserSession(UserSession userSession) {
-        userSessions.put(userSession.getChatId(), userSession);
+        userInfoRepository.save(UserSessionUtil.getUserInfo(userSession));
+    }
+
+    private Optional<UserSession> getFromDb(long chatId) {
+        Optional<UserInfo> userInfo = userInfoRepository.findById(chatId);
+        return userInfo.map(UserSessionUtil::getUserSession);
     }
 }

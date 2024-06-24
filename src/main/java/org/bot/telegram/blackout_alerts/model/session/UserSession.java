@@ -12,7 +12,7 @@ public class UserSession {
 
     private String text;
 
-    private Address address;
+    private Address address = new Address();
 
     private Schedule schedule;
 
@@ -33,15 +33,15 @@ public class UserSession {
     }
 
     public String getUserCity() {
-        return address != null ? address.getCity() : null;
+        return address.getCity();
     }
 
     public String getUserStreet() {
-        return address != null ? address.getStreet() : null;
+        return address.getStreet();
     }
 
     public String getUserHouse() {
-        return address != null ? address.getHouse() : null;
+        return address.getHouse();
     }
 
     public byte getShutdownGroup() {

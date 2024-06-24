@@ -21,8 +21,7 @@ public class ChangeAddressHandler extends AbstractHandler {
 
     @Override
     public boolean isHandleable(UserSession userSession) {
-        return CHANGE_ADDRESS.equals(userSession.getText()) &&
-            SessionState.ADDRESS_ACQUIRED.equals(userSession.getSessionState());
+        return CHANGE_ADDRESS.equals(userSession.getText());
     }
 
     @Override

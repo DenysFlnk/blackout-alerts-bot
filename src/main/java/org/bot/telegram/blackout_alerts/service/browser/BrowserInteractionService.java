@@ -44,21 +44,25 @@ public class BrowserInteractionService {
 
     private WebDriverWait autocompleteAwait;
 
-    public ShutDownSchedule getShutDownSchedule(UserSession userSession) {
+    public String getShutDownSchedule(UserSession userSession) {
         acquireWebDriverWithAwaits(this, userSession.getUserCity());
         awaitForDtekPage();
 
-        if (!userSession.getUserCity().equals(KYIV)) {
-            fillCityInput(userSession);
+        String schedule;
+        try {
+            if (!userSession.getUserCity().equals(KYIV)) {
+                fillCityInput(userSession);
+            }
+
+            fillStreetInput(userSession);
+            fillHouseInput(userSession);
+
+            setShutdownGroupByJS(userSession);
+            schedule = getScheduleByJS();
+        } finally {
+            releaseWebDriverWithAwaits(this);
         }
 
-        fillStreetInput(userSession);
-        fillHouseInput(userSession);
-
-        setShutdownGroupByJS(userSession);
-        ShutDownSchedule schedule = getScheduleByJS();
-
-        releaseWebDriverWithAwaits(this);
         return schedule;
     }
 
@@ -140,9 +144,9 @@ public class BrowserInteractionService {
 
         for (int i = 0; i < value.length(); i++) {
             actions.sendKeys(value.subSequence(i, i + 1));
-            actions.pause(Duration.ofMillis(100));
+            actions.pause(Duration.ofMillis(200));
         }
-        actions.pause(Duration.ofMillis(300));
+        actions.pause(Duration.ofMillis(500));
         actions.perform();
     }
 
@@ -181,11 +185,8 @@ public class BrowserInteractionService {
         userSession.setShutdownGroup(Byte.parseByte(json));
     }
 
-    private ShutDownSchedule getScheduleByJS() {
+    private String getScheduleByJS() {
         String json = (String) ((JavascriptExecutor) driver).executeScript(JS_GET_SCHEDULE);
-        json = json.trim();
-
-        TypeToken<ShutDownSchedule> token = new TypeToken<>() {};
-        return new Gson().fromJson(json, token.getType());
+        return json.trim();
     }
 }

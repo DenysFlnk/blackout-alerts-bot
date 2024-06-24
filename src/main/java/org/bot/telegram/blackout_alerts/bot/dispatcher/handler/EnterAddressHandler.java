@@ -4,7 +4,6 @@ import com.vdurmont.emoji.EmojiParser;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import org.bot.telegram.blackout_alerts.model.session.Address;
 import org.bot.telegram.blackout_alerts.model.session.SessionState;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.bot.telegram.blackout_alerts.service.TelegramService;
@@ -47,8 +46,6 @@ public class EnterAddressHandler extends AbstractHandler {
             telegramService.sendMessage(getEnterCityMessage(userSession));
 
             userSession.setSessionState(SessionState.WAIT_FOR_CITY);
-            userSession.setAddress(new Address());
-
             userSessionService.saveUserSession(userSession);
             return;
         }
@@ -71,8 +68,8 @@ public class EnterAddressHandler extends AbstractHandler {
                 userSession.setUserHouse(house);
                 message = getAddressAcquiredMessage(userSession);
                 userSession.setSessionState(SessionState.ADDRESS_ACQUIRED);
-                log.info("Address acquired: {}, {}, {}", userSession.getUserCity(), userSession.getUserStreet(),
-                    userSession.getUserHouse());
+                log.info("Chat id: {}, address acquired: {}, {}, {}", userSession.getChatId(), userSession.getUserCity(),
+                    userSession.getUserStreet(), userSession.getUserHouse());
             }
             default -> throw new IllegalStateException("Unexpected session state: " + userSession.getSessionState());
         }

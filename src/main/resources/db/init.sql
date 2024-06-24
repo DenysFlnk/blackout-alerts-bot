@@ -4,7 +4,7 @@ DROP TABLE IF EXISTS zone_schedule;
 
 CREATE TABLE user_info
 (
-    chatId        BIGINT PRIMARY KEY NOT NULL,
+    chat_id       BIGINT PRIMARY KEY NOT NULL,
     session_state VARCHAR            NOT NULL,
     user_city     VARCHAR,
     user_street   VARCHAR,
@@ -13,7 +13,7 @@ CREATE TABLE user_info
 
 CREATE TABLE address
 (
-    id             INTEGER PRIMARY KEY NOT NULL,
+    id             SERIAL PRIMARY KEY NOT NULL,
     city           VARCHAR             NOT NULL,
     street         VARCHAR             NOT NULL,
     house          VARCHAR             NOT NULL,
