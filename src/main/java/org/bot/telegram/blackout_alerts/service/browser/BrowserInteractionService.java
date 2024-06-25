@@ -14,7 +14,6 @@ import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.dtekPageIsReady;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 
-import com.vdurmont.emoji.EmojiParser;
 import java.time.Duration;
 import lombok.Getter;
 import lombok.Setter;

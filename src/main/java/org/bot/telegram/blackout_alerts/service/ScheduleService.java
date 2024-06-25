@@ -4,9 +4,11 @@ import static org.bot.telegram.blackout_alerts.util.ScheduleUtil.parseSchedule;
 import static org.bot.telegram.blackout_alerts.util.ScheduleUtil.renderTodaySchedule;
 
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bot.telegram.blackout_alerts.exception.address.InvalidAddressException;
 import org.bot.telegram.blackout_alerts.model.entity.AddressEntity;
 import org.bot.telegram.blackout_alerts.model.entity.Zone;
 import org.bot.telegram.blackout_alerts.model.entity.ZoneSchedule;
@@ -56,11 +58,26 @@ public class ScheduleService {
 
     private Schedule getShutdownScheduleFromWeb(UserSession userSession) {
         log.info("Getting shutdown schedule from web.");
-        String scheduleJson = browserService.getShutDownSchedule(userSession);
+        try {
+            String scheduleJson = browserService.getShutDownSchedule(userSession);
 
-        addressRepository.save(UserSessionUtil.getAddressEntity(userSession));
-        scheduleRepository.save(ScheduleUtil.getZoneSchedule(userSession, scheduleJson));
+            addressRepository.save(UserSessionUtil.getAddressEntity(userSession));
+            scheduleRepository.save(ScheduleUtil.getZoneSchedule(userSession, scheduleJson));
 
-        return parseSchedule(scheduleJson, userSession.getShutdownGroup());
+            return parseSchedule(scheduleJson, userSession.getShutdownGroup());
+        } catch (InvalidAddressException e) {
+            Optional<AddressEntity> addressEntity = addressRepository.findByCityAndStreetAndHouse(
+                userSession.getUserCity(), userSession.getUserStreet(), userSession.getUserHouse());
+
+            if (addressEntity.isPresent()) {
+                AddressEntity address = addressEntity.get();
+                Zone zone = Zone.findZone(address.getCity());
+                ZoneSchedule zoneSchedule = scheduleRepository.findById(zone).orElseThrow(
+                    () -> new NoSuchElementException(String.format("Schedule for zone %s not found", zone.name())));
+                return parseSchedule(zoneSchedule.getScheduleJson(), address.getShutdownGroup());
+            }
+
+            throw e;
+        }
     }
 }
