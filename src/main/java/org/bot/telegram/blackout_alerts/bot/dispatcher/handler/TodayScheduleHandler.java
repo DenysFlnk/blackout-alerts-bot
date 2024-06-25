@@ -2,6 +2,7 @@ package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 
 import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
+import org.bot.telegram.blackout_alerts.exception.address.InvalidAddressException;
 import org.bot.telegram.blackout_alerts.model.session.SessionState;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.bot.telegram.blackout_alerts.service.ScheduleService;
@@ -56,8 +57,8 @@ public class TodayScheduleHandler extends AbstractHandler {
         try {
             telegramService.sendMessage(getScheduleLoadingMessage(userSession));
             schedule = scheduleService.getRenderedTodaySchedule(userSession);
-        } catch (RuntimeException e) {
-            log.error("Invalid address.");
+        } catch (InvalidAddressException e) {
+            log.error("Invalid address for field {}, value {}", e.getAddressField(), e.getFieldValue());
 
             SendMessage sendMessage = SendMessage.builder()
                 .chatId(userSession.getChatId())

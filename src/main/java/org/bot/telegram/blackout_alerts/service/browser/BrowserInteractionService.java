@@ -14,14 +14,13 @@ import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.dtekPageIsReady;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.vdurmont.emoji.EmojiParser;
 import java.time.Duration;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.bot.telegram.blackout_alerts.model.json.ShutDownSchedule;
+import org.bot.telegram.blackout_alerts.exception.address.AddressField;
+import org.bot.telegram.blackout_alerts.exception.address.InvalidAddressException;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -84,10 +83,8 @@ public class BrowserInteractionService {
         try {
             cityAutocomplete = getAutocompleteInput(input, XPATH_CITY_AUTOCOMPLETE, userCity);
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException(EmojiParser.parseToUnicode("""
-                Йой! Схоже, що не правильно введений населений пункт :cold_sweat:
-                Натисніть "Ввести адресу", щоб спробувати ще :point_down:
-                """)); //TODO change exception
+            log.warn(e.getMessage());
+            throw new InvalidAddressException(AddressField.CITY, userCity);
         }
 
         if (!userCity.equals(cityAutocomplete)) {
@@ -105,10 +102,8 @@ public class BrowserInteractionService {
         try {
             streetAutocomplete = getAutocompleteInput(input, XPATH_STREET_AUTOCOMPLETE, userStreet);
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException(EmojiParser.parseToUnicode("""
-                Йой! Схоже, що не правильно введена вулиця :cold_sweat:
-                Натисніть "Ввести адресу", щоб спробувати ще :point_down:
-                """)); //TODO change exception
+            log.warn(e.getMessage());
+            throw new InvalidAddressException(AddressField.STREET, userStreet);
         }
 
         if (!userStreet.equals(streetAutocomplete)) {
@@ -126,10 +121,8 @@ public class BrowserInteractionService {
         try {
             houseAutocomplete = getAutocompleteInput(input, XPATH_HOUSE_AUTOCOMPLETE, userHouse);
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException(EmojiParser.parseToUnicode("""
-                Йой! Схоже, що не правильно введений номер будинку :cold_sweat:
-                Натисніть "Ввести адресу", щоб спробувати ще :point_down:
-                """)); //TODO change exception
+            log.warn(e.getMessage());
+            throw new InvalidAddressException(AddressField.HOUSE, userHouse);
         }
 
         if (!userHouse.equals(houseAutocomplete)) {
