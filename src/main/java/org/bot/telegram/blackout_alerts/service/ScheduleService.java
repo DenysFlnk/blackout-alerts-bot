@@ -1,9 +1,9 @@
 package org.bot.telegram.blackout_alerts.service;
 
-import static org.bot.telegram.blackout_alerts.util.ScheduleUtil.getScheduleExpireDate;
 import static org.bot.telegram.blackout_alerts.util.ScheduleUtil.parseSchedule;
 import static org.bot.telegram.blackout_alerts.util.ScheduleUtil.renderTodaySchedule;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,8 @@ public class ScheduleService {
     private final ZoneScheduleRepository scheduleRepository;
 
     public String getRenderedTodaySchedule(UserSession userSession) {
-        Schedule schedule = getShutdownScheduleFromDb(userSession).orElse(getShutdownScheduleFromWeb(userSession));
+        Schedule schedule = getShutdownScheduleFromDb(userSession)
+            .orElseGet(() -> getShutdownScheduleFromWeb(userSession));
         return renderTodaySchedule(schedule);
     }
 
@@ -43,7 +44,7 @@ public class ScheduleService {
         if (addressEntity.isPresent()) {
             AddressEntity address = addressEntity.get();
             Optional<ZoneSchedule> zoneSchedule = scheduleRepository.findByZoneAndExpireDateAfter(
-                Zone.findZone(address.getCity()).name(), getScheduleExpireDate());
+                Zone.findZone(address.getCity()), LocalDateTime.now());
 
             return zoneSchedule.map(schedule -> parseSchedule(schedule.getScheduleJson(), address.getShutdownGroup()));
         }

@@ -2,6 +2,7 @@ package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 
 import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
+import org.bot.telegram.blackout_alerts.model.session.SessionState;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.bot.telegram.blackout_alerts.service.TelegramService;
 import org.bot.telegram.blackout_alerts.service.UserSessionService;
@@ -31,11 +32,40 @@ public class StartHandler extends AbstractHandler {
         log.info("Chat id: {}, session state: {}, text: {}", userSession.getChatId(), userSession.getSessionState(),
             userSession.getText());
 
+        SendMessage sendMessage;
+        if (SessionState.START.equals(userSession.getSessionState())) {
+            sendMessage = getWelcomeMessage(userSession);
+        } else {
+            sendMessage = getWelcomeBackMessage(userSession);
+        }
+
+        telegramService.sendMessage(sendMessage);
+    }
+
+    private static SendMessage getWelcomeBackMessage(UserSession userSession) {
+        InlineKeyboardMarkup keyboard = KeyboardBuilder.builder()
+            .addShowAddressButton()
+            .addChangeAddressButton()
+            .addShowScheduleButton()
+            .build();
+
+        return SendMessage.builder()
+            .text(EmojiParser.parseToUnicode("""
+                Привіт! З поверненням! :ua:
+                
+                Оберіть варіант з наведених нижче :arrow_down:
+                """))
+            .chatId(userSession.getChatId())
+            .replyMarkup(keyboard)
+            .build();
+    }
+
+    private static SendMessage getWelcomeMessage(UserSession userSession) {
         InlineKeyboardMarkup keyboard = KeyboardBuilder.builder()
             .addEnterAddressButton()
             .build();
-        //TODO add another message for user with address acquired session state
-        SendMessage sendMessage = SendMessage.builder()
+
+        return SendMessage.builder()
             .text(EmojiParser.parseToUnicode("""
                 Привіт! Вас вітає Blackout alers Bot :ua:
                 
@@ -46,7 +76,5 @@ public class StartHandler extends AbstractHandler {
             .chatId(userSession.getChatId())
             .replyMarkup(keyboard)
             .build();
-
-        telegramService.sendMessage(sendMessage);
     }
 }
