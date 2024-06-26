@@ -39,6 +39,7 @@ public class TodayScheduleHandler extends AbstractHandler {
             userSession.getText());
 
         if (!SessionState.ADDRESS_ACQUIRED.equals(userSession.getSessionState())) {
+            log.warn("Chat id: {}, address not acquired", userSession.getChatId());
             InlineKeyboardMarkup keyboard = KeyboardBuilder.builder()
                 .addEnterAddressButton()
                 .build();

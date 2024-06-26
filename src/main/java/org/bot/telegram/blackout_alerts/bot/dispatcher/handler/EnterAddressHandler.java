@@ -42,7 +42,6 @@ public class EnterAddressHandler extends AbstractHandler {
             userSession.getText());
 
         if (ENTER_ADDRESS.equals(userSession.getText())) {
-            log.info("Found /enter_address command");
             telegramService.sendMessage(getEnterCityMessage(userSession));
 
             userSession.setSessionState(SessionState.WAIT_FOR_CITY);
@@ -53,17 +52,20 @@ public class EnterAddressHandler extends AbstractHandler {
         SendMessage message;
         switch (userSession.getSessionState()) {
             case WAIT_FOR_CITY -> {
+                log.info("Chat id: {}, entered city: {}", userSession.getChatId(), userSession.getText());
                 userSession.setUserCity(userSession.getText());
                 message = getEnterStreetMessage(userSession);
                 userSession.setSessionState(SessionState.WAIT_FOR_STREET);
             }
             case WAIT_FOR_STREET -> {
+                log.info("Chat id: {}, entered street: {}", userSession.getChatId(), userSession.getText());
                 String street = UserSessionUtil.parseStreet(userSession.getText());
                 userSession.setUserStreet(street);
                 message = getEnterHouseMessage(userSession);
                 userSession.setSessionState(SessionState.WAIT_FOR_HOUSE_NUMBER);
             }
             case WAIT_FOR_HOUSE_NUMBER -> {
+                log.info("Chat id: {}, entered house: {}", userSession.getChatId(), userSession.getText());
                 String house = UserSessionUtil.parseHouseNumber(userSession.getText());
                 userSession.setUserHouse(house);
                 message = getAddressAcquiredMessage(userSession);

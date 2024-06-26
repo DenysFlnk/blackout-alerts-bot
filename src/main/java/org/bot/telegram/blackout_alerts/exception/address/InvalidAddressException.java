@@ -24,6 +24,9 @@ public class InvalidAddressException extends IllegalArgumentException {
                 Йой! Схоже, що не правильно введений номер будинку :cold_sweat:
                 
                 Натисніть "Ввести адресу", щоб спробувати ще :point_down:
+                
+                Якщо ви впевнені в правильності введеної адреси  - можливі технічні проблеми з сайтом ДТЕК :zap:
+                Спробуйте ваш запит пізніше.
                 """);
 
     private final AddressField addressField;

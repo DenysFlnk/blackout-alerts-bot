@@ -39,7 +39,7 @@ public class ScheduleService {
     }
 
     private Optional<Schedule> getShutdownScheduleFromDb(UserSession userSession) {
-        log.info("Trying to get shutdown schedule from DB.");
+        log.info("Chat id: {}. Trying to get shutdown schedule from DB", userSession.getChatId());
         Optional<AddressEntity> addressEntity = addressRepository.findByCityAndStreetAndHouse(userSession.getUserCity(),
             userSession.getUserStreet(), userSession.getUserHouse());
 
@@ -51,13 +51,13 @@ public class ScheduleService {
             return zoneSchedule.map(schedule -> parseSchedule(schedule.getScheduleJson(), address.getShutdownGroup()));
         }
 
-        log.info("Address {}, {}, {} in DB not found.", userSession.getUserCity(), userSession.getUserStreet(),
+        log.info("Address {}, {}, {} in DB not found", userSession.getUserCity(), userSession.getUserStreet(),
             userSession.getUserHouse());
         return Optional.empty();
     }
 
     private Schedule getShutdownScheduleFromWeb(UserSession userSession) {
-        log.info("Getting shutdown schedule from web.");
+        log.info("Chat id: {}. Getting shutdown schedule from web", userSession.getChatId());
         try {
             String scheduleJson = browserService.getShutDownSchedule(userSession);
 
@@ -66,10 +66,12 @@ public class ScheduleService {
 
             return parseSchedule(scheduleJson, userSession.getShutdownGroup());
         } catch (InvalidAddressException e) {
+            log.warn("Got an exception while getting shutdown schedule from web. Trying to find address in DB");
             Optional<AddressEntity> addressEntity = addressRepository.findByCityAndStreetAndHouse(
                 userSession.getUserCity(), userSession.getUserStreet(), userSession.getUserHouse());
 
             if (addressEntity.isPresent()) {
+                log.info("Found address in DB {}", addressEntity.get());
                 AddressEntity address = addressEntity.get();
                 Zone zone = Zone.findZone(address.getCity());
                 ZoneSchedule zoneSchedule = scheduleRepository.findById(zone).orElseThrow(
