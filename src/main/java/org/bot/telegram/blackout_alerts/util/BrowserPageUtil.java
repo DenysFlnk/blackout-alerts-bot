@@ -3,6 +3,7 @@ package org.bot.telegram.blackout_alerts.util;
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
 public class BrowserPageUtil {
@@ -23,6 +24,8 @@ public class BrowserPageUtil {
     public static final String XPATH_HOUSE_AUTOCOMPLETE =
         "//div[contains(@id,'house_numautocomplete-list')]/div[not(text())]";
 
+    public static final String XPATH_CLOSE_MODAL_BTN = "//button[contains(@class,'modal__close')]";
+
     public static final String JS_GET_SCHEDULE = "return JSON.stringify(DisconSchedule.preset[\"data\"]);";
     public static final String JS_GET_GROUP = "return JSON.stringify(DisconSchedule.group);";
 
@@ -31,5 +34,11 @@ public class BrowserPageUtil {
             visibilityOfElementLocated(By.xpath(XPATH_STREET_INPUT)),
             visibilityOfElementLocated(By.xpath(XPATH_HOUSE_INPUT))
         );
+    }
+
+    public static void closeModal(WebDriver driver) {
+        if (!driver.findElements(By.xpath(XPATH_CLOSE_MODAL_BTN)).isEmpty()) {
+            driver.findElement(By.xpath(XPATH_CLOSE_MODAL_BTN)).click();
+        }
     }
 }

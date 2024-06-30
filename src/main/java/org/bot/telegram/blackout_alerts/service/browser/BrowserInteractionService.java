@@ -11,6 +11,7 @@ import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_INPUT;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_AUTOCOMPLETE;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_INPUT;
+import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.closeModal;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.dtekPageIsReady;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 
@@ -45,6 +46,7 @@ public class BrowserInteractionService {
     public String getShutDownSchedule(UserSession userSession) {
         acquireWebDriverWithAwaits(this, userSession.getUserCity());
         awaitForDtekPage();
+        closeModal(driver);
 
         String schedule;
         try {
