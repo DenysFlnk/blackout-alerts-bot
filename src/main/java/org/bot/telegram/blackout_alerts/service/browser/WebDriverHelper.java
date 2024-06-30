@@ -1,12 +1,14 @@
 package org.bot.telegram.blackout_alerts.service.browser;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import java.time.Duration;
+import lombok.extern.slf4j.Slf4j;
 import org.bot.telegram.blackout_alerts.util.BrowserPageUtil;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+@Slf4j
 public class WebDriverHelper {
 
     public static final String KYIV = "Київ";
@@ -16,13 +18,13 @@ public class WebDriverHelper {
 
     protected static void acquireWebDriverWithAwaits(BrowserInteractionService service, String city) {
         WebDriver webDriver = getDriver();
-        webDriver.manage().window().maximize();
 
         if (city.equals(KYIV)) {
             webDriver.navigate().to(BrowserPageUtil.DTEK_KYIV_URL);
         } else {
             webDriver.navigate().to(BrowserPageUtil.DTEK_REGIONS_URL);
         }
+        log.info("Driver`s current url {}", webDriver.getCurrentUrl());
 
         service.setDriver(webDriver);
         service.setPageAwait(getPageAwait(webDriver));
@@ -39,8 +41,18 @@ public class WebDriverHelper {
     private static WebDriver getDriver() {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless=new");
+        options.addArguments("--disable-extensions");
+        options.addArguments("--disable-popup-blocking");
+        options.addArguments("--disable-infobars");
+        options.addArguments("--disable-notifications");
+        options.addArguments("--disable-background-timer-throttling");
+        options.addArguments("--disable-backgrounding-occluded-windows");
+        options.addArguments("--disable-renderer-backgrounding");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
 
-        return new ChromeDriver(options);
+        return WebDriverManager.chromedriver().capabilities(options).create();
     }
 
     private static WebDriverWait getPageAwait(WebDriver driver) {

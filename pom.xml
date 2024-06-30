@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>org.bot.telegram</groupId>
 	<artifactId>blackout_alerts</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>blackout_alerts</name>
 	<description>blackout_alerts</description>
 
@@ -20,6 +20,7 @@
 		<selenium.version>4.21.0</selenium.version>
 		<gson.version>2.11.0</gson.version>
 		<emoji.version>5.1.1</emoji.version>
+		<web-driver-manager.version>5.9.1</web-driver-manager.version>
 	</properties>
 
 	<dependencies>
@@ -39,6 +40,12 @@
 			<artifactId>selenium-java</artifactId>
 			<version>${selenium.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>io.github.bonigarcia</groupId>
+			<artifactId>webdrivermanager</artifactId>
+			<version>${web-driver-manager.version}</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
