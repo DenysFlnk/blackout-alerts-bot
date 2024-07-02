@@ -41,7 +41,7 @@ public class ScheduleUtil {
     }
 
     public static LocalDateTime getScheduleExpireDate() {
-        return LocalDateTime.now().plusDays(3);
+        return LocalDateTime.now().plusDays(7);
     }
 
     public static String renderTodaySchedule(Schedule schedule) {
