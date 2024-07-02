@@ -10,9 +10,11 @@ import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_CITY_I
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_AUTOCOMPLETE;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_INPUT;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_AUTOCOMPLETE;
+import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_AUTOCOMPLETE_STRICT_FORMAT;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_INPUT;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.closeModal;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.dtekPageIsReady;
+import static org.bot.telegram.blackout_alerts.util.UserSessionUtil.*;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 
 import java.time.Duration;
@@ -99,18 +101,37 @@ public class BrowserInteractionService {
         WebElement input = driver.findElement(By.xpath(XPATH_STREET_INPUT));
         fillInput(input, userStreet);
 
-        String streetAutocomplete;
-        try {
-            streetAutocomplete = getAutocompleteInput(input, XPATH_STREET_AUTOCOMPLETE, userStreet);
-        } catch (IllegalArgumentException e) {
-            log.warn(e.getMessage());
-            throw new InvalidAddressException(AddressField.STREET, userStreet);
+        String xpath = String.format(XPATH_STREET_AUTOCOMPLETE_STRICT_FORMAT, userStreet.toLowerCase());
+        String streetAutocomplete = getStreetStrictAutocompleteInput(input, xpath);
+
+        if (streetAutocomplete == null) {
+            try {
+                String street = parseStreet(userStreet);
+                fillInput(input, street);
+                streetAutocomplete = getAutocompleteInput(input, XPATH_STREET_AUTOCOMPLETE, street);
+            } catch (IllegalArgumentException e) {
+                log.warn(e.getMessage());
+                throw new InvalidAddressException(AddressField.STREET, userStreet);
+            }
         }
 
         if (!userStreet.equals(streetAutocomplete)) {
             log.warn("User street {} does not match autocomplete street {}", userStreet, streetAutocomplete);
             userSession.setUserStreet(streetAutocomplete);
         }
+    }
+
+    private String getStreetStrictAutocompleteInput(WebElement input, String xpath) {
+        String autocompleteValue = null;
+        try {
+            WebElement autocompleteElement = autocompleteAwait.until(visibilityOfElementLocated(By.xpath(xpath)));
+            autocompleteElement.click();
+            autocompleteValue = input.getAttribute("value");
+        } catch (WebDriverException e) {
+            log.warn("Failed to get strict street autocomplete");
+        }
+
+        return autocompleteValue;
     }
 
     private void fillHouseInput(UserSession userSession) {
@@ -133,6 +154,7 @@ public class BrowserInteractionService {
     }
 
     private void fillInput(WebElement input, String value) {
+        input.clear();
         Actions actions = new Actions(driver)
             .click(input);
 
@@ -161,7 +183,6 @@ public class BrowserInteractionService {
                     modValue.deleteCharAt(modValue.length() - 1);
                     log.info("Trying to autocomplete {}", modValue);
 
-                    input.clear();
                     fillInput(input, modValue.toString());
                 }
             }

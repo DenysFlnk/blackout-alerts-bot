@@ -19,6 +19,8 @@ public class BrowserPageUtil {
 
     public static final String XPATH_STREET_INPUT = "//form[@id='discon_form']//input[@id='street']";
     public static final String XPATH_STREET_AUTOCOMPLETE = "//div[contains(@id,'streetautocomplete-list')]/div[1]";
+    public static final String XPATH_STREET_AUTOCOMPLETE_STRICT_FORMAT =
+        "//div[contains(@id,'streetautocomplete-list')]/div[strong[text()='%s'] and not(text()[2])]";
 
     public static final String XPATH_HOUSE_INPUT = "//form[@id='discon_form']//input[@id='house_num']";
     public static final String XPATH_HOUSE_AUTOCOMPLETE =

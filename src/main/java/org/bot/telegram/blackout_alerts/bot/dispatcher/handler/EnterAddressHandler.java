@@ -1,5 +1,8 @@
 package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 
+import static org.bot.telegram.blackout_alerts.service.browser.WebDriverHelper.KYIV;
+import static org.bot.telegram.blackout_alerts.util.UserSessionUtil.parseHouseNumber;
+
 import com.vdurmont.emoji.EmojiParser;
 import java.util.HashSet;
 import java.util.Set;
@@ -9,7 +12,6 @@ import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.bot.telegram.blackout_alerts.service.TelegramService;
 import org.bot.telegram.blackout_alerts.service.UserSessionService;
 import org.bot.telegram.blackout_alerts.util.KeyboardBuilder;
-import org.bot.telegram.blackout_alerts.util.UserSessionUtil;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -53,20 +55,20 @@ public class EnterAddressHandler extends AbstractHandler {
         switch (userSession.getSessionState()) {
             case WAIT_FOR_CITY -> {
                 log.info("Chat id: {}, entered city: {}", userSession.getChatId(), userSession.getText());
-                userSession.setUserCity(userSession.getText());
-                message = getEnterStreetMessage(userSession);
+                String city = userSession.getText();
+                userSession.setUserCity(city);
+                message = KYIV.equals(city) ? getEnterKyivStreetMessage(userSession) : getEnterRegionStreetMessage(userSession);
                 userSession.setSessionState(SessionState.WAIT_FOR_STREET);
             }
             case WAIT_FOR_STREET -> {
                 log.info("Chat id: {}, entered street: {}", userSession.getChatId(), userSession.getText());
-                String street = UserSessionUtil.parseStreet(userSession.getText());
-                userSession.setUserStreet(street);
+                userSession.setUserStreet(userSession.getText());
                 message = getEnterHouseMessage(userSession);
                 userSession.setSessionState(SessionState.WAIT_FOR_HOUSE_NUMBER);
             }
             case WAIT_FOR_HOUSE_NUMBER -> {
                 log.info("Chat id: {}, entered house: {}", userSession.getChatId(), userSession.getText());
-                String house = UserSessionUtil.parseHouseNumber(userSession.getText());
+                String house = parseHouseNumber(userSession.getText());
                 userSession.setUserHouse(house);
                 message = getAddressAcquiredMessage(userSession);
                 userSession.setSessionState(SessionState.ADDRESS_ACQUIRED);
@@ -87,16 +89,29 @@ public class EnterAddressHandler extends AbstractHandler {
             .build();
     }
 
-    private static SendMessage getEnterStreetMessage(UserSession userSession) {
+    private static SendMessage getEnterKyivStreetMessage(UserSession userSession) {
         return SendMessage.builder()
-            .text(EmojiParser.parseToUnicode(":point_right: Введіть назву вулиці, наприклад - Хрещатик"))
+            .text(EmojiParser.parseToUnicode("""
+                :point_right: Введіть назву вулиці, наприклад - вул. Хрещатик
+                
+                Якщо це площа, проспект або бульвар - додайте на початок пл., просп. або бульв. замість вул. відповідно
+                """))
+            .chatId(userSession.getChatId())
+            .build();
+    }
+
+    private static SendMessage getEnterRegionStreetMessage(UserSession userSession) {
+        return SendMessage.builder()
+            .text(EmojiParser.parseToUnicode("""
+                :point_right: Введіть назву вулиці, наприклад - Соборна
+                """))
             .chatId(userSession.getChatId())
             .build();
     }
 
     private static SendMessage getEnterHouseMessage(UserSession userSession) {
         return SendMessage.builder()
-            .text(EmojiParser.parseToUnicode(":point_right: Введіть номер будинку, наприклад - 23б"))
+            .text(EmojiParser.parseToUnicode(":point_right: Введіть номер будинку, наприклад - 2б"))
             .chatId(userSession.getChatId())
             .build();
     }
