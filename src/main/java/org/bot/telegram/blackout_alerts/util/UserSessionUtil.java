@@ -52,4 +52,13 @@ public class UserSessionUtil {
         addressEntity.setShutdownGroup(userSession.getShutdownGroup());
         return addressEntity;
     }
+
+    public static Address getAddress(AddressEntity addressEntity) {
+        Address address = new Address();
+        address.setCity(addressEntity.getCity());
+        address.setStreet(addressEntity.getStreet());
+        address.setHouse(addressEntity.getHouse());
+        address.setShutdownGroup(addressEntity.getShutdownGroup());
+        return address;
+    }
 }

@@ -12,12 +12,18 @@ public class InvalidAddressException extends IllegalArgumentException {
                 Йой! Схоже, що не правильно введений населений пункт :cold_sweat:
                 
                 Натисніть "Ввести адресу", щоб спробувати ще :point_down:
+                
+                Якщо ви впевнені в правильності введеної адреси  - можливі технічні проблеми з сайтом ДТЕК :zap:
+                Спробуйте ваш запит пізніше.
                 """);
 
     private static final String STREET_ERROR_MESSAGE = EmojiParser.parseToUnicode("""
                 Йой! Схоже, що не правильно введена вулиця :cold_sweat:
                 
                 Натисніть "Ввести адресу", щоб спробувати ще :point_down:
+                
+                Якщо ви впевнені в правильності введеної адреси  - можливі технічні проблеми з сайтом ДТЕК :zap:
+                Спробуйте ваш запит пізніше.
                 """);
 
     private static final String HOUSE_ERROR_MESSAGE = EmojiParser.parseToUnicode("""
