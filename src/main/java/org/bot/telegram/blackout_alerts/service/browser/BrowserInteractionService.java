@@ -12,9 +12,10 @@ import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_AUTOCOMPLETE;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_AUTOCOMPLETE_STRICT_FORMAT;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_INPUT;
-import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.closeModal;
+import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.awaitAndCloseModal;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.dtekPageIsReady;
 import static org.bot.telegram.blackout_alerts.util.UserSessionUtil.*;
+import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 
 import java.time.Duration;
@@ -48,7 +49,6 @@ public class BrowserInteractionService {
     public String getShutDownSchedule(UserSession userSession) {
         acquireWebDriverWithAwaits(this, userSession.getUserCity());
         awaitForDtekPage();
-        closeModal(driver);
 
         String schedule;
         try {
@@ -70,9 +70,12 @@ public class BrowserInteractionService {
 
     private void awaitForDtekPage() {
         try {
+            awaitAndCloseModal(autocompleteAwait);
             pageAwait.until(dtekPageIsReady());
         } catch (WebDriverException e) {
+            log.warn("Failed to await dtek page. Trying again.");
             driver.navigate().refresh();
+            awaitAndCloseModal(autocompleteAwait);
             pageAwait.until(dtekPageIsReady());
         }
     }
@@ -98,7 +101,7 @@ public class BrowserInteractionService {
 
     private void fillStreetInput(UserSession userSession) {
         String userStreet = userSession.getUserStreet();
-        WebElement input = driver.findElement(By.xpath(XPATH_STREET_INPUT));
+        WebElement input = pageAwait.until(elementToBeClickable(By.xpath(XPATH_STREET_INPUT)));
         fillInput(input, userStreet);
 
         String xpath = String.format(XPATH_STREET_AUTOCOMPLETE_STRICT_FORMAT, userStreet.toLowerCase());
@@ -136,7 +139,7 @@ public class BrowserInteractionService {
 
     private void fillHouseInput(UserSession userSession) {
         String userHouse = userSession.getUserHouse();
-        WebElement input = driver.findElement(By.xpath(XPATH_HOUSE_INPUT));
+        WebElement input = pageAwait.until(elementToBeClickable(By.xpath(XPATH_HOUSE_INPUT)));
         fillInput(input, userHouse);
 
         String houseAutocomplete;
@@ -162,7 +165,7 @@ public class BrowserInteractionService {
             actions.sendKeys(value.subSequence(i, i + 1));
             actions.pause(Duration.ofMillis(200));
         }
-        actions.pause(Duration.ofMillis(500));
+        actions.pause(Duration.ofMillis(700));
         actions.perform();
     }
 

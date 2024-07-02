@@ -60,6 +60,6 @@ public class WebDriverHelper {
     }
 
     private static WebDriverWait getAutocompleteAwait(WebDriver driver) {
-        return new WebDriverWait(driver, Duration.ofSeconds(3), Duration.ofSeconds(1));
+        return new WebDriverWait(driver, Duration.ofSeconds(5), Duration.ofSeconds(1));
     }
 }

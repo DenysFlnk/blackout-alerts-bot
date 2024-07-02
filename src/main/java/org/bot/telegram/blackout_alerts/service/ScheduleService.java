@@ -44,6 +44,7 @@ public class ScheduleService {
             userSession.getUserCity(), userSession.getUserStreet(), userSession.getUserHouse());
 
         if (addressEntity.isPresent()) {
+            log.info("Chat id: {}. Address is present in DB", userSession.getChatId());
             AddressEntity address = addressEntity.get();
             userSession.setAddress(UserSessionUtil.getAddress(address));
 
@@ -66,6 +67,7 @@ public class ScheduleService {
             addressRepository.save(UserSessionUtil.getAddressEntity(userSession));
             scheduleRepository.save(ScheduleUtil.getZoneSchedule(userSession, scheduleJson));
 
+            log.info("Chat id: {}. Success getting shutdown schedule from web", userSession.getChatId());
             return parseSchedule(scheduleJson, userSession.getShutdownGroup());
         } catch (InvalidAddressException e) {
             log.warn("Got an exception while getting shutdown schedule from web. Trying to find address in DB");
