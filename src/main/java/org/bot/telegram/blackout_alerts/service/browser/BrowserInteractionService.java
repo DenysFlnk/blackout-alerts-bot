@@ -5,7 +5,8 @@ import static org.bot.telegram.blackout_alerts.service.browser.WebDriverHelper.a
 import static org.bot.telegram.blackout_alerts.service.browser.WebDriverHelper.releaseWebDriverWithAwaits;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.JS_GET_GROUP;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.JS_GET_SCHEDULE;
-import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_CITY_AUTOCOMPLETE;
+import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_CITY_AUTOCOMPLETE_1;
+import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_CITY_AUTOCOMPLETE_2;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_CITY_INPUT;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_AUTOCOMPLETE;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_INPUT;
@@ -52,12 +53,11 @@ public class BrowserInteractionService {
 
         String schedule;
         try {
-            if (!userSession.getUserCity().equals(KYIV)) {
-                fillCityInput(userSession);
+            if (userSession.getUserCity().equals(KYIV)) {
+                fillKyivInputs(userSession);
+            } else {
+                fillRegionInputs(userSession);
             }
-
-            fillStreetInput(userSession);
-            fillHouseInput(userSession);
 
             setShutdownGroupByJS(userSession);
             schedule = getScheduleByJS();
@@ -66,6 +66,24 @@ public class BrowserInteractionService {
         }
 
         return schedule;
+    }
+
+    private void fillKyivInputs(UserSession userSession) {
+        fillStreetInput(userSession);
+        fillHouseInput(userSession);
+    }
+
+    private void fillRegionInputs(UserSession userSession) {
+        try {
+            fillRegionCityInput(userSession, false);
+            fillStreetInput(userSession);
+            fillHouseInput(userSession);
+        } catch (IllegalArgumentException e) {
+            log.warn("Failed to fill inputs. Trying to fill again using second city option");
+            fillRegionCityInput(userSession, true);
+            fillStreetInput(userSession);
+            fillHouseInput(userSession);
+        }
     }
 
     private void awaitForDtekPage() {
@@ -80,14 +98,15 @@ public class BrowserInteractionService {
         }
     }
 
-    private void fillCityInput(UserSession userSession) {
+    private void fillRegionCityInput(UserSession userSession, boolean isSecondTry) {
         String userCity = userSession.getUserCity();
         WebElement input = driver.findElement(By.xpath(XPATH_CITY_INPUT));
         fillInput(input, userCity);
 
         String cityAutocomplete;
         try {
-            cityAutocomplete = getAutocompleteInput(input, XPATH_CITY_AUTOCOMPLETE, userCity);
+            String autocompleteXpath = isSecondTry ? XPATH_CITY_AUTOCOMPLETE_2 : XPATH_CITY_AUTOCOMPLETE_1;
+            cityAutocomplete = getAutocompleteInput(input, autocompleteXpath, userCity);
         } catch (IllegalArgumentException e) {
             log.warn(e.getMessage());
             throw new InvalidAddressException(AddressField.CITY, userCity);
@@ -163,9 +182,9 @@ public class BrowserInteractionService {
 
         for (int i = 0; i < value.length(); i++) {
             actions.sendKeys(value.subSequence(i, i + 1));
-            actions.pause(Duration.ofMillis(200));
+            actions.pause(Duration.ofMillis(150));
         }
-        actions.pause(Duration.ofMillis(700));
+        actions.pause(Duration.ofMillis(500));
         actions.perform();
     }
 

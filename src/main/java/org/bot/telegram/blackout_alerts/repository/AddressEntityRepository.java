@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AddressEntityRepository extends JpaRepository<AddressEntity, Integer> {
 
-    Optional<AddressEntity> findByCityAndStreetContainsIgnoreCaseAndHouse(String city, String street, String house);
+    Optional<AddressEntity> findByCityContainsAndStreetContainsAndHouse(String city, String street, String house);
 }
