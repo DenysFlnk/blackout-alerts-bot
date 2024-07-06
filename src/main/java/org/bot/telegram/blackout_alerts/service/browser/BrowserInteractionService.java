@@ -182,9 +182,9 @@ public class BrowserInteractionService {
 
         for (int i = 0; i < value.length(); i++) {
             actions.sendKeys(value.subSequence(i, i + 1));
-            actions.pause(Duration.ofMillis(150));
+            actions.pause(Duration.ofMillis(50));
         }
-        actions.pause(Duration.ofMillis(500));
+        actions.pause(Duration.ofMillis(200));
         actions.perform();
     }
 

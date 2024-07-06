@@ -1,5 +1,7 @@
 FROM eclipse-temurin:21
 
+WORKDIR /bot
+
 #Install dependencies for Chrome
 RUN apt-get update \
     && apt-get install -y  \
@@ -35,14 +37,9 @@ RUN apt-get update \
         xdg-utils \
     && apt-get clean
 
-# Install Chrome
-RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
-    && dpkg -i google-chrome-stable_current_amd64.deb \
-    && rm google-chrome-stable_current_amd64.deb
+COPY ./src/main/resources/chrome/chrome_125.0.6422.141-1.deb chrome.deb
 
-ENV CHROME_BIN=/usr/bin/google-chrome
-
-WORKDIR /bot
+RUN dpkg -i chrome.deb && rm chrome.deb
 
 COPY target/*.jar  blackout_alerts.jar
 
