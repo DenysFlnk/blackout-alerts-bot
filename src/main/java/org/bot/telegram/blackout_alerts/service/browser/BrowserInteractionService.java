@@ -189,29 +189,15 @@ public class BrowserInteractionService {
     }
 
     private String getAutocompleteInput(WebElement input, String autocompleteXpath, String value) {
-        StringBuilder modValue = new StringBuilder(value);
-
-        String autocompleteValue = null;
-        do {
-            try {
-                WebElement autocompleteElement = autocompleteAwait.until(
-                    visibilityOfElementLocated(By.xpath(autocompleteXpath)));
-                autocompleteElement.click();
-                autocompleteValue = input.getAttribute("value");
-            } catch (WebDriverException e) {
-                log.warn("Failed to autocomplete {}", modValue);
-
-                if (modValue.length() > 3) {
-                    modValue.deleteCharAt(modValue.length() - 1);
-                    log.info("Trying to autocomplete {}", modValue);
-
-                    fillInput(input, modValue.toString());
-                }
-            }
-        } while (modValue.length() > 3 && autocompleteValue == null);
-
-        if (autocompleteValue == null) {
-            throw new IllegalArgumentException("Failed to autocomplete " + modValue);
+        String autocompleteValue;
+        try {
+            WebElement autocompleteElement = autocompleteAwait.until(
+                visibilityOfElementLocated(By.xpath(autocompleteXpath)));
+            autocompleteElement.click();
+            autocompleteValue = input.getAttribute("value");
+        } catch (WebDriverException e) {
+            log.warn("Failed to autocomplete {}", value);
+            throw new IllegalArgumentException("Failed to autocomplete " + value);
         }
 
         return autocompleteValue;
