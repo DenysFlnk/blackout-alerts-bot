@@ -40,7 +40,7 @@ public class ScheduleService {
 
     private Optional<Schedule> getShutdownScheduleFromDb(UserSession userSession) {
         log.info("Chat id: {}. Trying to get shutdown schedule from DB", userSession.getChatId());
-        Optional<AddressEntity> addressEntity = addressRepository.findByCityContainsAndStreetContainsAndHouse(
+        Optional<AddressEntity> addressEntity = addressRepository.findByCityContainsAndStreetContainsAndHouseContains(
             userSession.getUserCity(), userSession.getUserStreet(), userSession.getUserHouse());
 
         if (addressEntity.isPresent()) {
@@ -64,14 +64,14 @@ public class ScheduleService {
         try {
             String scheduleJson = browserService.getShutDownSchedule(userSession);
 
-            addressRepository.save(UserSessionUtil.getAddressEntity(userSession));
+            updateAddress(UserSessionUtil.getAddressEntity(userSession));
             scheduleRepository.save(ScheduleUtil.getZoneSchedule(userSession, scheduleJson));
 
             log.info("Chat id: {}. Success getting shutdown schedule from web", userSession.getChatId());
             return parseSchedule(scheduleJson, userSession.getShutdownGroup());
         } catch (InvalidAddressException e) {
             log.warn("Got an exception while getting shutdown schedule from web. Trying to find address in DB");
-            Optional<AddressEntity> addressEntity = addressRepository.findByCityContainsAndStreetContainsAndHouse(
+            Optional<AddressEntity> addressEntity = addressRepository.findByCityContainsAndStreetContainsAndHouseContains(
                 userSession.getUserCity(), userSession.getUserStreet(), userSession.getUserHouse());
 
             if (addressEntity.isPresent()) {
@@ -85,5 +85,11 @@ public class ScheduleService {
 
             throw e;
         }
+    }
+
+    private void updateAddress(AddressEntity address) {
+        addressRepository.findByCityAndStreetAndHouse(address.getCity(), address.getStreet(), address.getHouse())
+            .ifPresent(addressEntity -> address.setId(addressEntity.getId()));
+        addressRepository.save(address);
     }
 }
