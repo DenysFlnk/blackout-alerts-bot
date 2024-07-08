@@ -40,7 +40,7 @@ public class ScheduleService {
 
     private Optional<Schedule> getShutdownScheduleFromDb(UserSession userSession) {
         log.info("Chat id: {}. Trying to get shutdown schedule from DB", userSession.getChatId());
-        Optional<AddressEntity> addressEntity = addressRepository.findByCityContainsAndStreetContainsAndHouseContains(
+        Optional<AddressEntity> addressEntity = addressRepository.findByCityContainsAndStreetContainsAndHouse(
             userSession.getUserCity(), userSession.getUserStreet(), userSession.getUserHouse());
 
         if (addressEntity.isPresent()) {
@@ -71,7 +71,7 @@ public class ScheduleService {
             return parseSchedule(scheduleJson, userSession.getShutdownGroup());
         } catch (InvalidAddressException e) {
             log.warn("Got an exception while getting shutdown schedule from web. Trying to find address in DB");
-            Optional<AddressEntity> addressEntity = addressRepository.findByCityContainsAndStreetContainsAndHouseContains(
+            Optional<AddressEntity> addressEntity = addressRepository.findByCityContainsAndStreetContainsAndHouse(
                 userSession.getUserCity(), userSession.getUserStreet(), userSession.getUserHouse());
 
             if (addressEntity.isPresent()) {
