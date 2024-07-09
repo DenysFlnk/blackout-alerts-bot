@@ -4,8 +4,11 @@ import static org.bot.telegram.blackout_alerts.util.ScheduleUtil.parseSchedule;
 import static org.bot.telegram.blackout_alerts.util.ScheduleUtil.renderTodaySchedule;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bot.telegram.blackout_alerts.exception.address.InvalidAddressException;
@@ -40,8 +43,7 @@ public class ScheduleService {
 
     private Optional<Schedule> getShutdownScheduleFromDb(UserSession userSession) {
         log.info("Chat id: {}. Trying to get shutdown schedule from DB", userSession.getChatId());
-        Optional<AddressEntity> addressEntity = addressRepository.findByCityContainsAndStreetContainsAndHouse(
-            userSession.getUserCity(), userSession.getUserStreet(), userSession.getUserHouse());
+        Optional<AddressEntity> addressEntity = getAddressFromDb(userSession);
 
         if (addressEntity.isPresent()) {
             log.info("Chat id: {}. Address is present in DB", userSession.getChatId());
@@ -64,15 +66,14 @@ public class ScheduleService {
         try {
             String scheduleJson = browserService.getShutDownSchedule(userSession);
 
-            updateAddress(UserSessionUtil.getAddressEntity(userSession));
+            updateAddressInDb(UserSessionUtil.getAddressEntity(userSession));
             scheduleRepository.save(ScheduleUtil.getZoneSchedule(userSession, scheduleJson));
 
             log.info("Chat id: {}. Success getting shutdown schedule from web", userSession.getChatId());
             return parseSchedule(scheduleJson, userSession.getShutdownGroup());
         } catch (InvalidAddressException e) {
             log.warn("Got an exception while getting shutdown schedule from web. Trying to find address in DB");
-            Optional<AddressEntity> addressEntity = addressRepository.findByCityContainsAndStreetContainsAndHouse(
-                userSession.getUserCity(), userSession.getUserStreet(), userSession.getUserHouse());
+            Optional<AddressEntity> addressEntity = getAddressFromDb(userSession);
 
             if (addressEntity.isPresent()) {
                 log.info("Found address in DB {}", addressEntity.get());
@@ -87,7 +88,32 @@ public class ScheduleService {
         }
     }
 
-    private void updateAddress(AddressEntity address) {
+    private Optional<AddressEntity> getAddressFromDb(UserSession userSession) {
+        List<AddressEntity> addresses = addressRepository.findAllByCityContainsAndStreetContainsAndHouse(
+            userSession.getUserCity(), userSession.getUserStreet(), userSession.getUserHouse());
+
+        if (addresses.isEmpty()) {
+            return Optional.empty();
+        }
+
+        if (addresses.size() > 1) {
+            log.info("Found more then one address in DB. Getting latest");
+            List<AddressEntity> sortedAddresses = addresses.stream()
+                .sorted(Comparator.comparingInt(AddressEntity::getId))
+                .collect(Collectors.toList());
+
+            AddressEntity result = sortedAddresses.remove(sortedAddresses.size() - 1);
+
+            sortedAddresses.forEach(address -> addressRepository.deleteById(address.getId()));
+
+            log.info("Latest address: {}, {}, {}", result.getCity(), result.getStreet(), result.getHouse());
+            return Optional.of(result);
+        } else {
+            return Optional.of(addresses.get(0));
+        }
+    }
+
+    private void updateAddressInDb(AddressEntity address) {
         addressRepository.findByCityAndStreetAndHouse(address.getCity(), address.getStreet(), address.getHouse())
             .ifPresent(addressEntity -> address.setId(addressEntity.getId()));
         addressRepository.save(address);

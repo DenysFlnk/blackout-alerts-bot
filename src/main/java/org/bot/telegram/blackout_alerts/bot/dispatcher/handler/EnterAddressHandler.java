@@ -68,7 +68,7 @@ public class EnterAddressHandler extends AbstractHandler {
             }
             case WAIT_FOR_HOUSE_NUMBER -> {
                 log.info("Chat id: {}, entered house: {}", userSession.getChatId(), userSession.getText());
-                String house = parseHouseNumber(userSession.getText());
+                String house = parseHouseNumber(userSession.getText()).toUpperCase();
                 userSession.setUserHouse(house);
                 message = getAddressAcquiredMessage(userSession);
                 userSession.setSessionState(SessionState.ADDRESS_ACQUIRED);

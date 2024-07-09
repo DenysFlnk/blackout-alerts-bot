@@ -31,4 +31,12 @@ public class AddressEntity {
 
     @Column(name = "shutdown_group")
     private byte shutdownGroup;
+
+    public AddressEntity(Integer id, String city, String street, String house, byte shutdownGroup) {
+        this.id = id;
+        this.city = city;
+        this.street = street;
+        this.house = house;
+        this.shutdownGroup = shutdownGroup;
+    }
 }

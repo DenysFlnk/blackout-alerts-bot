@@ -28,12 +28,13 @@ public class InvalidAddressException extends IllegalArgumentException {
 
     private static final String HOUSE_ERROR_MESSAGE = EmojiParser.parseToUnicode("""
                 Йой! Схоже, що не правильно введений номер будинку :cold_sweat:
-                
+               
                 Натисніть "Ввести адресу", щоб спробувати ще :point_down:
-                
-                Якщо ви впевнені в правильності введеної адреси  - можливі технічні проблеми з сайтом ДТЕК :zap:
-                Спробуйте ваш запит пізніше.
-                """);
+               
+                Якщо ви впевнені в правильності введеної адреси  - спробуйте ввести свою адресу на сайті ДТЕК,
+               можливі різні варіанти написання вашого номеру будинку (2б або 2/б і т.п.).
+               Після цього спробуйте ще раз.
+               """);
 
     private final AddressField addressField;
 
