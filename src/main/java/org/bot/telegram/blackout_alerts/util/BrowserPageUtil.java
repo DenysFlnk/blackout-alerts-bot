@@ -18,8 +18,8 @@ public class BrowserPageUtil {
     public static final String DTEK_REGIONS_URL = "https://www.dtek-krem.com.ua/ua/shutdowns";
 
     public static final String XPATH_CITY_INPUT = "//form[@id='discon_form']//input[@id='city']";
-    public static final String XPATH_CITY_AUTOCOMPLETE_1 = "//div[contains(@id,'cityautocomplete-list')]/div[1]";
-    public static final String XPATH_CITY_AUTOCOMPLETE_2 = "//div[contains(@id,'cityautocomplete-list')]/div[2]";
+    public static final String XPATH_CITY_AUTOCOMPLETE_LIST = "//div[contains(@id,'cityautocomplete-list')]/div";
+    public static final String XPATH_CITY_AUTOCOMPLETE_FORMAT = "//div[contains(@id,'cityautocomplete-list')]/div[%s]";
 
     public static final String XPATH_STREET_INPUT = "//form[@id='discon_form']//input[@id='street']";
     public static final String XPATH_STREET_AUTOCOMPLETE = "//div[contains(@id,'streetautocomplete-list')]/div[1]";
