@@ -5,11 +5,13 @@ import static org.bot.telegram.blackout_alerts.service.browser.WebDriverHelper.a
 import static org.bot.telegram.blackout_alerts.service.browser.WebDriverHelper.releaseWebDriverWithAwaits;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.JS_GET_GROUP;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.JS_GET_SCHEDULE;
+import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.JS_SCROLL_INTO_VIEW;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_CITY_AUTOCOMPLETE_FORMAT;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_CITY_AUTOCOMPLETE_LIST;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_CITY_INPUT;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_AUTOCOMPLETE;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_INPUT;
+import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_SCHEDULE_TABLE;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_AUTOCOMPLETE;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_AUTOCOMPLETE_STRICT_FORMAT;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_INPUT;
@@ -19,6 +21,7 @@ import static org.bot.telegram.blackout_alerts.util.UserSessionUtil.parseStreet;
 import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 
+import java.io.ByteArrayInputStream;
 import java.time.Duration;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,8 +29,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.bot.telegram.blackout_alerts.exception.address.AddressField;
 import org.bot.telegram.blackout_alerts.exception.address.InvalidAddressException;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
+import org.bot.telegram.blackout_alerts.util.BrowserPageUtil;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -66,6 +72,29 @@ public class BrowserInteractionService {
         }
 
         return schedule;
+    }
+
+    public ByteArrayInputStream getWeekShutdownScheduleScreenshot(UserSession userSession) {
+        acquireWebDriverWithAwaits(this, userSession.getUserCity());
+        driver.manage().window().setSize(new Dimension(1024, 768));
+        awaitForDtekPage();
+
+        byte[] screenshotBytes;
+        try {
+            if (userSession.getUserCity().equals(KYIV)) {
+                fillKyivInputs(userSession);
+            } else {
+                fillRegionInputs(userSession);
+            }
+
+            setShutdownGroupByJS(userSession);
+
+            screenshotBytes = getScreenshotOfElementLocated(XPATH_SCHEDULE_TABLE);
+        } finally {
+            releaseWebDriverWithAwaits(this);
+        }
+
+        return new ByteArrayInputStream(screenshotBytes);
     }
 
     private void awaitForDtekPage() {
@@ -225,5 +254,15 @@ public class BrowserInteractionService {
     private String getScheduleByJS() {
         String json = (String) ((JavascriptExecutor) driver).executeScript(JS_GET_SCHEDULE);
         return json.trim();
+    }
+
+    private byte[] getScreenshotOfElementLocated(String xpath) {
+        WebElement element = driver.findElement(By.xpath(xpath));
+        scrollIntoView(element);
+        return element.getScreenshotAs(OutputType.BYTES);
+    }
+
+    private void scrollIntoView(WebElement element) {
+        ((JavascriptExecutor) driver).executeScript(JS_SCROLL_INTO_VIEW, element);
     }
 }

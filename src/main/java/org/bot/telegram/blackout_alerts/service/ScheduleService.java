@@ -3,6 +3,7 @@ package org.bot.telegram.blackout_alerts.service;
 import static org.bot.telegram.blackout_alerts.util.ScheduleUtil.parseSchedule;
 import static org.bot.telegram.blackout_alerts.util.ScheduleUtil.renderTodaySchedule;
 
+import java.io.ByteArrayInputStream;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -34,6 +35,12 @@ public class ScheduleService {
     private final AddressEntityRepository addressRepository;
 
     private final ZoneScheduleRepository scheduleRepository;
+
+    public ByteArrayInputStream getWeekScheduleScreenshot(UserSession userSession) {
+        ByteArrayInputStream screenshot = browserService.getWeekShutdownScheduleScreenshot(userSession);
+        updateAddressInDb(UserSessionUtil.getAddressEntity(userSession));
+        return screenshot;
+    }
 
     public String getRenderedTodaySchedule(UserSession userSession) {
         Schedule schedule = getShutdownScheduleFromDb(userSession)
