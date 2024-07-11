@@ -2,6 +2,7 @@ package org.bot.telegram.blackout_alerts.service;
 
 import lombok.AllArgsConstructor;
 import org.bot.telegram.blackout_alerts.bot.TelegramBotSender;
+import org.bot.telegram.blackout_alerts.exception.MessageSenderException;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -16,7 +17,7 @@ public class TelegramService {
         try {
             sender.execute(message);
         } catch (TelegramApiException e) {
-            throw new RuntimeException(e); //TODO
+            throw new MessageSenderException(e);
         }
     }
 }
