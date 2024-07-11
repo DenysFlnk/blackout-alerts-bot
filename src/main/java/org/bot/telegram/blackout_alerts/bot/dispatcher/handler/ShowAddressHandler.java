@@ -43,6 +43,7 @@ public class ShowAddressHandler extends AbstractHandler {
         if (SessionState.ADDRESS_ACQUIRED.equals(userSession.getSessionState())) {
             InlineKeyboardMarkup keyboard = KeyboardBuilder.builder()
                 .addShowScheduleButton()
+                .addShowWeekScheduleButton()
                 .build();
             messageBuilder.replyMarkup(keyboard);
         }

@@ -46,6 +46,8 @@ public class WeekScheduleHandler extends AbstractHandler {
             return;
         }
 
+        sendScheduleLoadingMessage(userSession);
+
         ByteArrayInputStream screenshot;
         try {
             screenshot = scheduleService.getWeekScheduleScreenshot(userSession);
@@ -74,8 +76,7 @@ public class WeekScheduleHandler extends AbstractHandler {
             %s, %s, %s
             
             :triangular_flag_on_post: Зверніть увагу, що графік актуальний на %s.
-            Не забувайте час від часу надсилати запит на тижневий графік повторно,
-            щоб бути впевненим в його актуальності :white_check_mark:
+            Не забувайте час від часу надсилати запит на тижневий графік повторно, щоб бути впевненим в його актуальності :white_check_mark:
             """), userSession.getUserCity(), userSession.getUserStreet(), userSession.getUserHouse(),
             LocalDate.now());
     }
