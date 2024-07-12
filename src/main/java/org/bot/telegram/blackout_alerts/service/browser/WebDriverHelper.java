@@ -1,5 +1,7 @@
 package org.bot.telegram.blackout_alerts.service.browser;
 
+import static org.bot.telegram.blackout_alerts.util.AddressUtil.isKyiv;
+
 import io.github.bonigarcia.wdm.WebDriverManager;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
@@ -11,15 +13,13 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 @Slf4j
 public class WebDriverHelper {
 
-    public static final String KYIV = "Київ";
-
     private WebDriverHelper() {
     }
 
     protected static void acquireWebDriverWithAwaits(BrowserInteractionService service, String city) {
         WebDriver webDriver = getDriver();
 
-        if (city.equals(KYIV)) {
+        if (isKyiv(city)) {
             webDriver.navigate().to(BrowserPageUtil.DTEK_KYIV_URL);
         } else {
             webDriver.navigate().to(BrowserPageUtil.DTEK_REGIONS_URL);

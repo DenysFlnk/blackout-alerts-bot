@@ -26,7 +26,7 @@ public class MessageDispatcher {
                 .findAny()
                 .ifPresent(handler -> handler.handle(session));
         } catch (Exception e) {
-            log.error("Exception while dispatching message", e);
+            log.error("Chat id: {}. Exception while dispatching message", session.getChatId(), e);
             SendMessage message = SendMessage.builder()
                 .chatId(session.getChatId())
                 .text(EmojiParser.parseToUnicode("""

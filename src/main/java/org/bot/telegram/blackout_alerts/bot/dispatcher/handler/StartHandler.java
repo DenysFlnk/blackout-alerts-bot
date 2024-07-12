@@ -28,8 +28,8 @@ public class StartHandler extends AbstractHandler {
 
     @Override
     public void handle(UserSession userSession) {
-        log.info("StartHandler.handle()");
-        log.info("Chat id: {}, session state: {}, text: {}", userSession.getChatId(), userSession.getSessionState(),
+        log.info("Chat id: {}. StartHandler.handle()", userSession.getChatId());
+        log.info("Chat id: {}. Session state: {}. Text: {}", userSession.getChatId(), userSession.getSessionState(),
             userSession.getText());
 
         SendMessage sendMessage;

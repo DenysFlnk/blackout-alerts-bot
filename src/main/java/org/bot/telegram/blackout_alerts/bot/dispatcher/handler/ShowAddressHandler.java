@@ -30,8 +30,8 @@ public class ShowAddressHandler extends AbstractHandler {
 
     @Override
     public void handle(UserSession userSession) {
-        log.info("ShowAddressHandler.handle()");
-        log.info("Chat id: {}, session state: {}, text: {}", userSession.getChatId(), userSession.getSessionState(),
+        log.info("Chat id: {}. ShowAddressHandler.handle()", userSession.getChatId());
+        log.info("Chat id: {}. Session state: {}. Text: {}", userSession.getChatId(), userSession.getSessionState(),
             userSession.getText());
 
         String message = getAddressMessage(userSession);

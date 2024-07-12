@@ -1,8 +1,9 @@
 package org.bot.telegram.blackout_alerts.service.browser;
 
-import static org.bot.telegram.blackout_alerts.service.browser.WebDriverHelper.KYIV;
 import static org.bot.telegram.blackout_alerts.service.browser.WebDriverHelper.acquireWebDriverWithAwaits;
 import static org.bot.telegram.blackout_alerts.service.browser.WebDriverHelper.releaseWebDriverWithAwaits;
+import static org.bot.telegram.blackout_alerts.util.AddressUtil.isKyiv;
+import static org.bot.telegram.blackout_alerts.util.AddressUtil.parseLastPartOfStreet;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.JS_GET_GROUP;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.JS_GET_SCHEDULE;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.JS_SCROLL_INTO_VIEW;
@@ -17,7 +18,6 @@ import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_INPUT;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.awaitAndCloseModal;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.dtekPageIsReady;
-import static org.bot.telegram.blackout_alerts.util.UserSessionUtil.parseStreet;
 import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 
@@ -29,7 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.bot.telegram.blackout_alerts.exception.address.AddressField;
 import org.bot.telegram.blackout_alerts.exception.address.InvalidAddressException;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
-import org.bot.telegram.blackout_alerts.util.BrowserPageUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
@@ -54,12 +53,13 @@ public class BrowserInteractionService {
     private WebDriverWait autocompleteAwait;
 
     public String getShutDownSchedule(UserSession userSession) {
-        acquireWebDriverWithAwaits(this, userSession.getUserCity());
+        String userCity = userSession.getUserCity();
+        acquireWebDriverWithAwaits(this, userCity);
         awaitForDtekPage();
 
         String schedule;
         try {
-            if (userSession.getUserCity().equals(KYIV)) {
+            if (isKyiv(userCity)) {
                 fillKyivInputs(userSession);
             } else {
                 fillRegionInputs(userSession);
@@ -75,13 +75,14 @@ public class BrowserInteractionService {
     }
 
     public ByteArrayInputStream getWeekShutdownScheduleScreenshot(UserSession userSession) {
-        acquireWebDriverWithAwaits(this, userSession.getUserCity());
+        String userCity = userSession.getUserCity();
+        acquireWebDriverWithAwaits(this, userCity);
         driver.manage().window().setSize(new Dimension(1024, 768));
         awaitForDtekPage();
 
         byte[] screenshotBytes;
         try {
-            if (userSession.getUserCity().equals(KYIV)) {
+            if (isKyiv(userCity)) {
                 fillKyivInputs(userSession);
             } else {
                 fillRegionInputs(userSession);
@@ -124,7 +125,7 @@ public class BrowserInteractionService {
                 fillHouseInput(userSession);
                 break;
             } catch (InvalidAddressException e) {
-                log.warn("Failed to fill inputs for city option {}", i);
+                log.warn("Chat id: {}. Failed to fill inputs for city option {}", userSession.getChatId(), i);
                 if (i == autocompleteOptionsCount) {
                     throw e;
                 }
@@ -133,7 +134,8 @@ public class BrowserInteractionService {
 
         String cityAutocomplete = driver.findElement(By.xpath(XPATH_CITY_INPUT)).getAttribute("value");
         if (!userSession.getUserCity().equals(cityAutocomplete)) {
-            log.warn("User city {} does not match autocomplete city {}", userSession.getUserCity(), cityAutocomplete);
+            log.warn("Chat id: {}. User city {} does not match autocomplete city {}", userSession.getChatId(),
+                userSession.getUserCity(), cityAutocomplete);
             userSession.setUserCity(cityAutocomplete);
         }
     }
@@ -160,7 +162,7 @@ public class BrowserInteractionService {
         String autocompleteXpath = String.format(XPATH_CITY_AUTOCOMPLETE_FORMAT, optionNumber);
         String cityAutocomplete = getAutocompleteInput(input, autocompleteXpath, userCity);
 
-        log.info("Chat id: {}, user city: {}, autocomplete: {}", userSession.getChatId(), userCity, cityAutocomplete);
+        log.info("Chat id: {}. User city: {}, autocomplete: {}", userSession.getChatId(), userCity, cityAutocomplete);
     }
 
     private void fillStreetInput(UserSession userSession) {
@@ -173,7 +175,7 @@ public class BrowserInteractionService {
 
         if (streetAutocomplete == null) {
             try {
-                String street = parseStreet(userStreet);
+                String street = parseLastPartOfStreet(userStreet);
                 fillInput(input, street);
                 streetAutocomplete = getAutocompleteInput(input, XPATH_STREET_AUTOCOMPLETE, street);
             } catch (IllegalArgumentException e) {
@@ -182,7 +184,8 @@ public class BrowserInteractionService {
         }
 
         if (!userStreet.equals(streetAutocomplete)) {
-            log.warn("User street {} does not match autocomplete street {}", userStreet, streetAutocomplete);
+            log.warn("Chat id: {}. User street {} does not match autocomplete street {}", userSession.getChatId(),
+                userStreet, streetAutocomplete);
             userSession.setUserStreet(streetAutocomplete);
         }
     }
@@ -213,7 +216,8 @@ public class BrowserInteractionService {
         }
 
         if (!userHouse.equals(houseAutocomplete)) {
-            log.warn("User house {} does not match autocomplete house {}", userHouse, houseAutocomplete);
+            log.warn("Chat id: {}. User house {} does not match autocomplete house {}", userSession.getChatId(),
+                userHouse, houseAutocomplete);
             userSession.setUserHouse(houseAutocomplete);
         }
     }

@@ -39,6 +39,7 @@ public class ScheduleService {
     public ByteArrayInputStream getWeekScheduleScreenshot(UserSession userSession) {
         ByteArrayInputStream screenshot = browserService.getWeekShutdownScheduleScreenshot(userSession);
         updateAddressInDb(UserSessionUtil.getAddressEntity(userSession));
+        log.info("Chat id: {}. Success getting week shutdown schedule screenshot", userSession.getChatId());
         return screenshot;
     }
 
@@ -63,8 +64,8 @@ public class ScheduleService {
             return zoneSchedule.map(schedule -> parseSchedule(schedule.getScheduleJson(), address.getShutdownGroup()));
         }
 
-        log.info("Address {}, {}, {} in DB not found", userSession.getUserCity(), userSession.getUserStreet(),
-            userSession.getUserHouse());
+        log.info("Chat id: {}. Address {}, {}, {} in DB not found", userSession.getChatId(), userSession.getUserCity(),
+            userSession.getUserStreet(), userSession.getUserHouse());
         return Optional.empty();
     }
 
@@ -79,11 +80,12 @@ public class ScheduleService {
             log.info("Chat id: {}. Success getting shutdown schedule from web", userSession.getChatId());
             return parseSchedule(scheduleJson, userSession.getShutdownGroup());
         } catch (InvalidAddressException e) {
-            log.warn("Got an exception while getting shutdown schedule from web. Trying to find address in DB");
+            log.warn("Chat id: {}. Got an exception while getting shutdown schedule from web. "
+                + "Trying to find address in DB", userSession.getChatId());
             Optional<AddressEntity> addressEntity = getAddressFromDb(userSession);
 
             if (addressEntity.isPresent()) {
-                log.info("Found address in DB {}", addressEntity.get());
+                log.info("Chat id: {}. Found address in DB {}", userSession.getChatId(), addressEntity.get());
                 AddressEntity address = addressEntity.get();
                 Zone zone = Zone.findZone(address.getCity());
                 ZoneSchedule zoneSchedule = scheduleRepository.findById(zone).orElseThrow(
@@ -104,7 +106,7 @@ public class ScheduleService {
         }
 
         if (addresses.size() > 1) {
-            log.info("Found more then one address in DB. Getting latest");
+            log.info("Chat id: {}. Found more then one address in DB. Getting latest", userSession.getChatId());
             List<AddressEntity> sortedAddresses = addresses.stream()
                 .sorted(Comparator.comparingInt(AddressEntity::getId))
                 .collect(Collectors.toList());

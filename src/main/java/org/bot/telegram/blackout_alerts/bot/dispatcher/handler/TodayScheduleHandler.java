@@ -1,6 +1,5 @@
 package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 
-import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
 import org.bot.telegram.blackout_alerts.exception.address.InvalidAddressException;
 import org.bot.telegram.blackout_alerts.model.session.SessionState;
@@ -8,10 +7,8 @@ import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.bot.telegram.blackout_alerts.service.ScheduleService;
 import org.bot.telegram.blackout_alerts.service.TelegramService;
 import org.bot.telegram.blackout_alerts.service.UserSessionService;
-import org.bot.telegram.blackout_alerts.util.KeyboardBuilder;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
 @Component
 @Slf4j
@@ -34,12 +31,12 @@ public class TodayScheduleHandler extends AbstractHandler {
 
     @Override
     public void handle(UserSession userSession) {
-        log.info("TodayScheduleHandler.handle()");
-        log.info("Chat id: {}, session state: {}, text: {}", userSession.getChatId(), userSession.getSessionState(),
+        log.info("Chat id: {}. TodayScheduleHandler.handle()", userSession.getChatId());
+        log.info("Chat id: {}. Session state: {}. Text: {}", userSession.getChatId(), userSession.getSessionState(),
             userSession.getText());
 
         if (!SessionState.ADDRESS_ACQUIRED.equals(userSession.getSessionState())) {
-            log.warn("Chat id: {}, address not acquired", userSession.getChatId());
+            log.warn("Chat id: {}. Address not acquired", userSession.getChatId());
             sendAddressNotAcquiredMessage(userSession);
             return;
         }
@@ -50,7 +47,8 @@ public class TodayScheduleHandler extends AbstractHandler {
         try {
             schedule = scheduleService.getRenderedTodaySchedule(userSession);
         } catch (InvalidAddressException e) {
-            log.error("Invalid address for field {}, value {}", e.getAddressField(), e.getFieldValue());
+            log.error("Chat id: {}. Invalid address for field {}, value {}", userSession.getChatId(),
+                e.getAddressField(), e.getFieldValue());
             sendInvalidAddressMessage(userSession, e.getMessage());
             return;
         }

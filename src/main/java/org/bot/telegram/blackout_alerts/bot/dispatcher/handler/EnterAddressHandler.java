@@ -1,7 +1,8 @@
 package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 
-import static org.bot.telegram.blackout_alerts.service.browser.WebDriverHelper.KYIV;
-import static org.bot.telegram.blackout_alerts.util.UserSessionUtil.parseHouseNumber;
+import static org.bot.telegram.blackout_alerts.util.AddressUtil.isKyiv;
+import static org.bot.telegram.blackout_alerts.util.AddressUtil.parseHouseNumber;
+import static org.bot.telegram.blackout_alerts.util.AddressUtil.parseKyivStreetPrefix;
 
 import com.vdurmont.emoji.EmojiParser;
 import java.util.HashSet;
@@ -39,8 +40,8 @@ public class EnterAddressHandler extends AbstractHandler {
 
     @Override
     public void handle(UserSession userSession) {
-        log.info("EnterAddressHandler.handle()");
-        log.info("Chat id: {}, session state: {}, text: {}", userSession.getChatId(), userSession.getSessionState(),
+        log.info("Chat id: {}. EnterAddressHandler.handle()", userSession.getChatId());
+        log.info("Chat id: {}. Session state: {}. Text: {}", userSession.getChatId(), userSession.getSessionState(),
             userSession.getText());
 
         if (ENTER_ADDRESS.equals(userSession.getText())) {
@@ -54,25 +55,27 @@ public class EnterAddressHandler extends AbstractHandler {
         SendMessage message;
         switch (userSession.getSessionState()) {
             case WAIT_FOR_CITY -> {
-                log.info("Chat id: {}, entered city: {}", userSession.getChatId(), userSession.getText());
+                log.info("Chat id: {}. Entered city: {}", userSession.getChatId(), userSession.getText());
                 String city = userSession.getText();
                 userSession.setUserCity(city);
-                message = KYIV.equals(city) ? getEnterKyivStreetMessage(userSession) : getEnterRegionStreetMessage(userSession);
+                message = isKyiv(city) ? getEnterKyivStreetMessage(userSession) : getEnterRegionStreetMessage(userSession);
                 userSession.setSessionState(SessionState.WAIT_FOR_STREET);
             }
             case WAIT_FOR_STREET -> {
-                log.info("Chat id: {}, entered street: {}", userSession.getChatId(), userSession.getText());
-                userSession.setUserStreet(userSession.getText());
+                log.info("Chat id: {}. Entered street: {}", userSession.getChatId(), userSession.getText());
+                String text = userSession.getText();
+                String street = isKyiv(userSession.getUserCity()) ? parseKyivStreetPrefix(text) : text;
+                userSession.setUserStreet(street);
                 message = getEnterHouseMessage(userSession);
                 userSession.setSessionState(SessionState.WAIT_FOR_HOUSE_NUMBER);
             }
             case WAIT_FOR_HOUSE_NUMBER -> {
-                log.info("Chat id: {}, entered house: {}", userSession.getChatId(), userSession.getText());
+                log.info("Chat id: {}. Entered house: {}", userSession.getChatId(), userSession.getText());
                 String house = parseHouseNumber(userSession.getText()).toUpperCase();
                 userSession.setUserHouse(house);
                 message = getAddressAcquiredMessage(userSession);
                 userSession.setSessionState(SessionState.ADDRESS_ACQUIRED);
-                log.info("Chat id: {}, address acquired: {}, {}, {}", userSession.getChatId(), userSession.getUserCity(),
+                log.info("Chat id: {}. Address acquired: {}, {}, {}", userSession.getChatId(), userSession.getUserCity(),
                     userSession.getUserStreet(), userSession.getUserHouse());
             }
             default -> throw new IllegalStateException("Unexpected session state: " + userSession.getSessionState());
@@ -92,9 +95,9 @@ public class EnterAddressHandler extends AbstractHandler {
     private static SendMessage getEnterKyivStreetMessage(UserSession userSession) {
         return SendMessage.builder()
             .text(EmojiParser.parseToUnicode("""
-                :point_right: Введіть назву вулиці, наприклад - вул. Хрещатик
+                :point_right: Введіть назву вулиці, наприклад - вулиця Хрещатик
                 
-                Якщо це площа, проспект або бульвар - додайте на початок пл., просп. або бульв. замість вул. відповідно
+                Якщо це площа, проспект або бульвар - додайте на початок площа, проспект або бульвар замість вулиці відповідно
                 """))
             .chatId(userSession.getChatId())
             .build();
@@ -126,8 +129,9 @@ public class EnterAddressHandler extends AbstractHandler {
         return SendMessage.builder()
             .text(EmojiParser.parseToUnicode("""
                 Адреса успішно збережена :ok_hand:
-                Натисніть кнопку "Отримати графік на сьогодні :bulb:" або "Отримати графік на тиждень :calendar:",
-                щоб подивитись графік відключень за збереженою адресою або "Змінити адресу :arrows_counterclockwise:" для зміни введеної адреси
+                Натисніть кнопку "Отримати графік на сьогодні :bulb:"
+                або "Отримати графік на тиждень :calendar:", щоб подивитись графік відключень за збереженою адресою
+                або "Змінити адресу :arrows_counterclockwise:" для зміни введеної адреси
                 """))
             .chatId(userSession.getChatId())
             .replyMarkup(keyboard)

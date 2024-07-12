@@ -36,12 +36,12 @@ public class WeekScheduleHandler extends AbstractHandler {
 
     @Override
     public void handle(UserSession userSession) {
-        log.info("WeekScheduleHandler.handle()");
-        log.info("Chat id: {}, session state: {}, text: {}", userSession.getChatId(), userSession.getSessionState(),
+        log.info("Chat id: {}. WeekScheduleHandler.handle()", userSession.getChatId());
+        log.info("Chat id: {}. Session state: {}. Text: {}", userSession.getChatId(), userSession.getSessionState(),
             userSession.getText());
 
         if (!SessionState.ADDRESS_ACQUIRED.equals(userSession.getSessionState())) {
-            log.warn("Chat id: {}, address not acquired", userSession.getChatId());
+            log.warn("Chat id: {}. Address not acquired", userSession.getChatId());
             sendAddressNotAcquiredMessage(userSession);
             return;
         }
@@ -52,7 +52,8 @@ public class WeekScheduleHandler extends AbstractHandler {
         try {
             screenshot = scheduleService.getWeekScheduleScreenshot(userSession);
         } catch (InvalidAddressException e) {
-            log.error("Invalid address for field {}, value {}", e.getAddressField(), e.getFieldValue());
+            log.error("Chat id: {}. Invalid address for field {}, value {}", userSession.getChatId(),
+                e.getAddressField(), e.getFieldValue());
             sendInvalidAddressMessage(userSession, e.getMessage());
             return;
         }
