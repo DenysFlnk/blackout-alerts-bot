@@ -13,6 +13,7 @@ public class KeyboardBuilder {
     private static final InlineKeyboardButton changeAddressButton = changeAddressButton();
     private static final InlineKeyboardButton showAddressButton = showAddressButton();
     private static final InlineKeyboardButton showScheduleButton = showScheduleButton();
+    private static final InlineKeyboardButton showWeekScheduleButton = showWeekScheduleButton();
 
     private final List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
@@ -37,6 +38,11 @@ public class KeyboardBuilder {
 
     public KeyboardBuilder addShowScheduleButton() {
         keyboard.add(Collections.singletonList(showScheduleButton));
+        return this;
+    }
+
+    public KeyboardBuilder addShowWeekScheduleButton() {
+        keyboard.add(Collections.singletonList(showWeekScheduleButton));
         return this;
     }
 
@@ -74,5 +80,10 @@ public class KeyboardBuilder {
         return button;
     }
 
-
+    private static InlineKeyboardButton showWeekScheduleButton() {
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText(EmojiParser.parseToUnicode("Отримати графік на тиждень :calendar:"));
+        button.setCallbackData("/week_schedule");
+        return button;
+    }
 }

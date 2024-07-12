@@ -31,16 +31,16 @@ public class MenuHandler extends AbstractHandler {
         log.info("Chat id: {}, session state: {}, text: {}", userSession.getChatId(), userSession.getSessionState(),
             userSession.getText());
 
-        KeyboardBuilder keyboardBuilder = KeyboardBuilder.builder()
-            .addShowAddressButton();
+        KeyboardBuilder keyboardBuilder = KeyboardBuilder.builder();
 
         if (userSession.getSessionState().equals(SessionState.ADDRESS_ACQUIRED)) {
-            keyboardBuilder.addChangeAddressButton();
+            keyboardBuilder.addShowAddressButton()
+                .addChangeAddressButton()
+                .addShowScheduleButton()
+                .addShowWeekScheduleButton();
         } else {
             keyboardBuilder.addEnterAddressButton();
         }
-
-        keyboardBuilder.addShowScheduleButton();
 
         SendMessage message = SendMessage.builder()
             .chatId(userSession.getChatId())

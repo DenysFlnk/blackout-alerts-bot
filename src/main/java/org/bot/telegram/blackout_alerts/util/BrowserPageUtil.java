@@ -32,8 +32,12 @@ public class BrowserPageUtil {
 
     public static final String XPATH_CLOSE_MODAL_BTN = "//button[contains(@class,'modal__close')]";
 
+    public static final String XPATH_SCHEDULE_TABLE = "//div[contains(@class,'discon-schedule-table')]//table";
+
     public static final String JS_GET_SCHEDULE = "return JSON.stringify(DisconSchedule.preset[\"data\"]);";
     public static final String JS_GET_GROUP = "return JSON.stringify(DisconSchedule.group);";
+
+    public static final String JS_SCROLL_INTO_VIEW = "arguments[0].scrollIntoView({block: 'center'});";
 
     public static void awaitAndCloseModal(WebDriverWait await) {
         try {

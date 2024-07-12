@@ -40,33 +40,18 @@ public class TodayScheduleHandler extends AbstractHandler {
 
         if (!SessionState.ADDRESS_ACQUIRED.equals(userSession.getSessionState())) {
             log.warn("Chat id: {}, address not acquired", userSession.getChatId());
-            InlineKeyboardMarkup keyboard = KeyboardBuilder.builder()
-                .addEnterAddressButton()
-                .build();
-
-            SendMessage sendMessage = SendMessage.builder()
-                .chatId(userSession.getChatId())
-                .text(EmojiParser.parseToUnicode(":exclamation: Необхідно ввести повну адресу для отримання графіку відключень"))
-                .replyMarkup(keyboard)
-                .build();
-
-            telegramService.sendMessage(sendMessage);
+            sendAddressNotAcquiredMessage(userSession);
             return;
         }
 
+        sendScheduleLoadingMessage(userSession);
+
         String schedule;
         try {
-            telegramService.sendMessage(getScheduleLoadingMessage(userSession));
             schedule = scheduleService.getRenderedTodaySchedule(userSession);
         } catch (InvalidAddressException e) {
             log.error("Invalid address for field {}, value {}", e.getAddressField(), e.getFieldValue());
-
-            SendMessage sendMessage = SendMessage.builder()
-                .chatId(userSession.getChatId())
-                .text(e.getMessage())
-                .replyMarkup(KeyboardBuilder.builder().addEnterAddressButton().build())
-                .build();
-            telegramService.sendMessage(sendMessage);
+            sendInvalidAddressMessage(userSession, e.getMessage());
             return;
         }
 
@@ -78,15 +63,5 @@ public class TodayScheduleHandler extends AbstractHandler {
 
         telegramService.sendMessage(sendMessage);
         userSessionService.saveUserSession(userSession);
-    }
-
-    private static SendMessage getScheduleLoadingMessage(UserSession userSession) {
-        return SendMessage.builder()
-            .chatId(userSession.getChatId())
-            .text(EmojiParser.parseToUnicode("""
-                Графік завантажується :sunglasses:
-                
-                Зазвичай це займає декілька секунд :pray:"""))
-            .build();
     }
 }
