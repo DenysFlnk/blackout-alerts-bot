@@ -124,18 +124,14 @@ public class EnterAddressHandler extends AbstractHandler {
 
     private SendMessage getAddressAcquiredMessage(UserSession userSession) {
         InlineKeyboardMarkup keyboard = KeyboardBuilder.builder()
+            .addCheckShutdownStatusButton()
             .addShowScheduleButton()
             .addShowWeekScheduleButton()
             .addChangeAddressButton()
             .build();
 
         return SendMessage.builder()
-            .text(EmojiParser.parseToUnicode("""
-                Адреса успішно збережена :ok_hand:
-                Натисніть кнопку "Отримати графік на сьогодні :bulb:"
-                або "Отримати графік на тиждень :calendar:", щоб подивитись графік відключень за збереженою адресою
-                або "Змінити адресу :arrows_counterclockwise:" для зміни введеної адреси
-                """))
+            .text(EmojiParser.parseToUnicode("Адреса успішно збережена :ok_hand:"))
             .chatId(userSession.getChatId())
             .replyMarkup(keyboard)
             .build();

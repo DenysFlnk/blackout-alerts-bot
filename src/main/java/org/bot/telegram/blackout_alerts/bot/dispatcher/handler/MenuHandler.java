@@ -37,7 +37,8 @@ public class MenuHandler extends AbstractHandler {
             keyboardBuilder.addShowAddressButton()
                 .addChangeAddressButton()
                 .addShowScheduleButton()
-                .addShowWeekScheduleButton();
+                .addShowWeekScheduleButton()
+                .addCheckShutdownStatusButton();
         } else {
             keyboardBuilder.addEnterAddressButton();
         }

@@ -13,6 +13,7 @@ import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_CITY_I
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_AUTOCOMPLETE;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_INPUT;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_SCHEDULE_TABLE;
+import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_SHUTDOWN_STATUS;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_AUTOCOMPLETE;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_AUTOCOMPLETE_STRICT_FORMAT;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_INPUT;
@@ -96,6 +97,29 @@ public class BrowserInteractionService {
         }
 
         return new ByteArrayInputStream(screenshotBytes);
+    }
+
+    public String getShutdownStatus(UserSession userSession) {
+        String userCity = userSession.getUserCity();
+        acquireWebDriverWithAwaits(this, userCity);
+        awaitForDtekPage();
+
+        String status;
+        try {
+            if (isKyiv(userCity)) {
+                fillKyivInputs(userSession);
+            } else {
+                fillRegionInputs(userSession);
+            }
+
+            setShutdownGroupByJS(userSession);
+
+            status = driver.findElement(By.xpath(XPATH_SHUTDOWN_STATUS)).getText();
+        } finally {
+            releaseWebDriverWithAwaits(this);
+        }
+
+        return status;
     }
 
     private void awaitForDtekPage() {
