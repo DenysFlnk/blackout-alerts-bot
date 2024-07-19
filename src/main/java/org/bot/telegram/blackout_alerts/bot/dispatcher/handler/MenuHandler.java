@@ -1,6 +1,5 @@
 package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 
-import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
 import org.bot.telegram.blackout_alerts.model.session.SessionState;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
@@ -27,7 +26,7 @@ public class MenuHandler extends AbstractHandler {
 
     @Override
     public void handle(UserSession userSession) {
-        log.info("Chat id: {}. StartHandler.handle()", userSession.getChatId());
+        log.info("Chat id: {}. MenuHandler.handle()", userSession.getChatId());
         log.info("Chat id: {}. Session state: {}. Text: {}", userSession.getChatId(), userSession.getSessionState(),
             userSession.getText());
 
@@ -37,14 +36,15 @@ public class MenuHandler extends AbstractHandler {
             keyboardBuilder.addShowAddressButton()
                 .addChangeAddressButton()
                 .addShowScheduleButton()
-                .addShowWeekScheduleButton();
+                .addShowWeekScheduleButton()
+                .addCheckShutdownStatusButton();
         } else {
             keyboardBuilder.addEnterAddressButton();
         }
 
         SendMessage message = SendMessage.builder()
             .chatId(userSession.getChatId())
-            .text(EmojiParser.parseToUnicode("Оберіть варіант з наведених нижче :arrow_down:"))
+            .text("⬇ Оберіть варіант з наведених нижче ⬇")
             .replyMarkup(keyboardBuilder.build())
             .build();
 

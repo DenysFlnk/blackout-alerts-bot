@@ -14,6 +14,7 @@ public class KeyboardBuilder {
     private static final InlineKeyboardButton showAddressButton = showAddressButton();
     private static final InlineKeyboardButton showScheduleButton = showScheduleButton();
     private static final InlineKeyboardButton showWeekScheduleButton = showWeekScheduleButton();
+    private static final InlineKeyboardButton checkShutdownStatusButton = checkShutdownStatusButton();
 
     private final List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
@@ -43,6 +44,11 @@ public class KeyboardBuilder {
 
     public KeyboardBuilder addShowWeekScheduleButton() {
         keyboard.add(Collections.singletonList(showWeekScheduleButton));
+        return this;
+    }
+
+    public KeyboardBuilder addCheckShutdownStatusButton() {
+        keyboard.add(Collections.singletonList(checkShutdownStatusButton));
         return this;
     }
 
@@ -84,6 +90,13 @@ public class KeyboardBuilder {
         InlineKeyboardButton button = new InlineKeyboardButton();
         button.setText(EmojiParser.parseToUnicode("Отримати графік на тиждень :calendar:"));
         button.setCallbackData("/week_schedule");
+        return button;
+    }
+
+    private static InlineKeyboardButton checkShutdownStatusButton() {
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText("Перевірити поточний статус відключення \uD83D\uDD0E");
+        button.setCallbackData("/check_shutdown_status");
         return button;
     }
 }

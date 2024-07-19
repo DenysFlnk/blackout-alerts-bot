@@ -13,6 +13,7 @@ import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_CITY_I
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_AUTOCOMPLETE;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_INPUT;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_SCHEDULE_TABLE;
+import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_SHUTDOWN_STATUS;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_AUTOCOMPLETE;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_AUTOCOMPLETE_STRICT_FORMAT;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_INPUT;
@@ -26,6 +27,7 @@ import java.time.Duration;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.bot.telegram.blackout_alerts.exception.ShutdownStatusUnavailableException;
 import org.bot.telegram.blackout_alerts.exception.address.AddressField;
 import org.bot.telegram.blackout_alerts.exception.address.InvalidAddressException;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
@@ -96,6 +98,45 @@ public class BrowserInteractionService {
         }
 
         return new ByteArrayInputStream(screenshotBytes);
+    }
+
+    public String getShutdownStatus(UserSession userSession) {
+        String userCity = userSession.getUserCity();
+        acquireWebDriverWithAwaits(this, userCity);
+        awaitForDtekPage();
+
+        String status;
+        try {
+            if (isKyiv(userCity)) {
+                fillKyivInputs(userSession);
+            } else {
+                fillRegionInputs(userSession);
+            }
+
+            setShutdownGroupByJS(userSession);
+
+            status = getShutdownStatus();
+        } finally {
+            releaseWebDriverWithAwaits(this);
+        }
+
+        return status;
+    }
+
+    private String getShutdownStatus() {
+        String text;
+        try {
+            text = driver.findElement(By.xpath(XPATH_SHUTDOWN_STATUS)).getText();
+            if (text.isEmpty()) {
+                log.warn("Shutdown status text is empty");
+                throw new ShutdownStatusUnavailableException();
+            }
+        } catch (WebDriverException e) {
+            log.error("Error while getting shutdown status text", e);
+            throw new ShutdownStatusUnavailableException();
+        }
+
+        return text;
     }
 
     private void awaitForDtekPage() {
