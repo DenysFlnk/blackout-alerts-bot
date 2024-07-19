@@ -26,7 +26,7 @@ public class MenuHandler extends AbstractHandler {
 
     @Override
     public void handle(UserSession userSession) {
-        log.info("Chat id: {}. StartHandler.handle()", userSession.getChatId());
+        log.info("Chat id: {}. MenuHandler.handle()", userSession.getChatId());
         log.info("Chat id: {}. Session state: {}. Text: {}", userSession.getChatId(), userSession.getSessionState(),
             userSession.getText());
 
