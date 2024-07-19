@@ -131,7 +131,11 @@ public class EnterAddressHandler extends AbstractHandler {
             .build();
 
         return SendMessage.builder()
-            .text(EmojiParser.parseToUnicode("Адреса успішно збережена :ok_hand:"))
+            .text("""
+                Адреса успішно збережена \uD83D\uDC4C
+                
+                ⬇ Доступні функції ⬇
+                """)
             .chatId(userSession.getChatId())
             .replyMarkup(keyboard)
             .build();

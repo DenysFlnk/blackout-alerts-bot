@@ -27,6 +27,7 @@ import java.time.Duration;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.bot.telegram.blackout_alerts.exception.ShutdownStatusUnavailableException;
 import org.bot.telegram.blackout_alerts.exception.address.AddressField;
 import org.bot.telegram.blackout_alerts.exception.address.InvalidAddressException;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
@@ -114,12 +115,28 @@ public class BrowserInteractionService {
 
             setShutdownGroupByJS(userSession);
 
-            status = driver.findElement(By.xpath(XPATH_SHUTDOWN_STATUS)).getText();
+            status = getShutdownStatus();
         } finally {
             releaseWebDriverWithAwaits(this);
         }
 
         return status;
+    }
+
+    private String getShutdownStatus() {
+        String text;
+        try {
+            text = driver.findElement(By.xpath(XPATH_SHUTDOWN_STATUS)).getText();
+            if (text.isEmpty()) {
+                log.warn("Shutdown status text is empty");
+                throw new ShutdownStatusUnavailableException();
+            }
+        } catch (WebDriverException e) {
+            log.error("Error while getting shutdown status text", e);
+            throw new ShutdownStatusUnavailableException();
+        }
+
+        return text;
     }
 
     private void awaitForDtekPage() {

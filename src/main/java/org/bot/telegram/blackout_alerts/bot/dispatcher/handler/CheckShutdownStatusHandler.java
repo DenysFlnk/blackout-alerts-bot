@@ -1,6 +1,7 @@
 package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 
 import lombok.extern.slf4j.Slf4j;
+import org.bot.telegram.blackout_alerts.exception.ShutdownStatusUnavailableException;
 import org.bot.telegram.blackout_alerts.model.session.SessionState;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.bot.telegram.blackout_alerts.service.ShutdownStatusService;
@@ -43,7 +44,17 @@ public class CheckShutdownStatusHandler extends AbstractHandler {
 
         sendStatusLoadingMessage(userSession);
 
-        String status = shutdownStatusService.getShutdownStatus(userSession);
+        String status = null;
+        try {
+            status = shutdownStatusService.getShutdownStatus(userSession);
+        } catch (ShutdownStatusUnavailableException e) {
+            SendMessage message = SendMessage.builder()
+                .chatId(userSession.getChatId())
+                .text(e.getMessage())
+                .build();
+            telegramService.sendMessage(message);
+        }
+
         String textMessage = String.format("""
             Статус відключення світла за адресою:
             %s, %s, %s ⬇
