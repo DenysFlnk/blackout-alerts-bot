@@ -144,7 +144,7 @@ public class BrowserInteractionService {
             awaitAndCloseModal(autocompleteAwait);
             pageAwait.until(dtekPageIsReady());
         } catch (WebDriverException e) {
-            log.warn("Failed to await dtek page. Trying again.");
+            log.warn("Failed to await dtek page. Trying again");
             driver.navigate().refresh();
             awaitAndCloseModal(autocompleteAwait);
             pageAwait.until(dtekPageIsReady());
@@ -157,6 +157,25 @@ public class BrowserInteractionService {
     }
 
     private void fillRegionInputs(UserSession userSession) {
+        try {
+            fillRegionInputsWithAwareOfCityOptions(userSession);
+        } catch (InvalidAddressException e) {
+            log.warn("Chat id: {}. Failed to fill region inputs", userSession.getChatId());
+
+            if (userSession.getUserCity().contains("(")) {
+                String cityWithoutRegion = userSession.getUserCity().split(" ")[0];
+                log.info("Chat id: {}. User city contains region, trying to fill inputs without it",
+                    userSession.getChatId());
+
+                userSession.setUserCity(cityWithoutRegion);
+                fillRegionInputsWithAwareOfCityOptions(userSession);
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    private void fillRegionInputsWithAwareOfCityOptions(UserSession userSession) {
         int autocompleteOptionsCount = getRegionCityOptionsCount(userSession);
 
         for (int i = 1; i <= autocompleteOptionsCount; i++) {
