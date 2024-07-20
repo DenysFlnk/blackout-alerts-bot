@@ -68,6 +68,7 @@ public class WeekScheduleHandler extends AbstractHandler {
             .build();
 
         telegramService.sendPhoto(photo);
+        userSessionService.saveUserSession(userSession);
     }
 
     public static String getCaption(UserSession userSession) {

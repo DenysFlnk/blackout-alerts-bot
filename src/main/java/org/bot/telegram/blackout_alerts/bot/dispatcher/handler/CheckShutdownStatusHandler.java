@@ -74,6 +74,7 @@ public class CheckShutdownStatusHandler extends AbstractHandler {
             .build();
 
         telegramService.sendMessage(message);
+        userSessionService.saveUserSession(userSession);
     }
 
     private void sendStatusLoadingMessage(UserSession userSession) {
