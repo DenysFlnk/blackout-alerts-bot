@@ -1,6 +1,5 @@
 package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 
-import com.vdurmont.emoji.EmojiParser;
 import lombok.AllArgsConstructor;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.bot.telegram.blackout_alerts.service.TelegramService;
@@ -23,7 +22,7 @@ public abstract class AbstractHandler implements Handler {
 
         SendMessage message = SendMessage.builder()
             .chatId(userSession.getChatId())
-            .text(EmojiParser.parseToUnicode(":exclamation: Необхідно ввести повну адресу для отримання графіку відключень"))
+            .text("❗ Необхідно ввести повну адресу для отримання графіку відключень")
             .replyMarkup(keyboard)
             .build();
 
@@ -33,10 +32,10 @@ public abstract class AbstractHandler implements Handler {
     protected void sendScheduleLoadingMessage(UserSession userSession) {
         SendMessage message = SendMessage.builder()
             .chatId(userSession.getChatId())
-            .text(EmojiParser.parseToUnicode("""
-                Графік завантажується :sunglasses:
+            .text("""
+                Графік завантажується 😎
                 
-                Зазвичай це займає 10-15 секунд :pray:"""))
+                Зазвичай це займає 10-15 секунд 🙏""")
             .build();
 
         telegramService.sendMessage(message);

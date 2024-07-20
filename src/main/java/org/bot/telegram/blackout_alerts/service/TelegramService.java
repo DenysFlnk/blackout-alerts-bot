@@ -26,7 +26,7 @@ public class TelegramService {
         try {
             sender.execute(message);
         } catch (TelegramApiException e) {
-            throw new RuntimeException(e); //TODO
+            throw new MessageSenderException(e);
         }
     }
 }

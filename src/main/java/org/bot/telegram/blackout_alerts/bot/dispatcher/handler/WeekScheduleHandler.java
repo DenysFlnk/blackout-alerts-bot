@@ -1,6 +1,5 @@
 package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 
-import com.vdurmont.emoji.EmojiParser;
 import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -72,13 +71,13 @@ public class WeekScheduleHandler extends AbstractHandler {
     }
 
     public static String getCaption(UserSession userSession) {
-        return String.format(EmojiParser.parseToUnicode("""
+        return String.format("""
             Графік відключень на тиждень за адресою:
             %s, %s, %s
             
-            :triangular_flag_on_post: Зверніть увагу, що графік актуальний на %s.
-            Не забувайте час від часу надсилати запит на тижневий графік повторно, щоб бути впевненим в його актуальності :white_check_mark:
-            """), userSession.getUserCity(), userSession.getUserStreet(), userSession.getUserHouse(),
+            🚩 Зверніть увагу, що графік актуальний на %s.
+            Не забувайте час від часу надсилати запит на тижневий графік повторно, щоб бути впевненим в його актуальності ✅
+            """, userSession.getUserCity(), userSession.getUserStreet(), userSession.getUserHouse(),
             LocalDate.now());
     }
 }

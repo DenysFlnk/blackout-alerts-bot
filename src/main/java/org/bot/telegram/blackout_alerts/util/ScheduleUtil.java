@@ -1,6 +1,5 @@
 package org.bot.telegram.blackout_alerts.util;
 
-import static com.vdurmont.emoji.EmojiParser.parseToUnicode;
 import static org.bot.telegram.blackout_alerts.model.schedule.Possibility.valueOf;
 
 import com.google.gson.Gson;
@@ -47,7 +46,7 @@ public class ScheduleUtil {
     public static String renderTodaySchedule(Schedule schedule) {
         DayOfWeek today = LocalDate.now().getDayOfWeek();
         List<Pair<String, String>> currentDayPossibilities = schedule.getWeekListMap().get(today);
-        List<String> headerList = Arrays.asList(parseToUnicode(":clock5:"), parseToUnicode(":bulb:"));
+        List<String> headerList = Arrays.asList("\uD83D\uDD54", "\uD83D\uDCA1");
         List<List<String>> rowList = currentDayPossibilities.stream()
             .map(pair -> Arrays.asList(pair.getFirst(), pair.getSecond()))
             .toList();

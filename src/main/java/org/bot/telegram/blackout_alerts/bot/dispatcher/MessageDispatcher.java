@@ -1,6 +1,5 @@
 package org.bot.telegram.blackout_alerts.bot.dispatcher;
 
-import com.vdurmont.emoji.EmojiParser;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,11 +36,11 @@ public class MessageDispatcher {
             log.error("Chat id: {}. Exception while dispatching message", session.getChatId(), e);
             SendMessage message = SendMessage.builder()
                 .chatId(session.getChatId())
-                .text(EmojiParser.parseToUnicode("""
-                     Схоже, що сталася помилка при обробці вашого запиту  :disappointed_relieved:
+                .text("""
+                     Схоже, що сталася помилка при обробці вашого запиту  😥
                     
-                     Спробуйте, будь ласка, пізніше :clock12:
-                    """))
+                     Спробуйте, будь ласка, пізніше 🕛
+                    """)
                 .build();
             telegramService.sendMessage(message);
         }

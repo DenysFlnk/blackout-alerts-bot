@@ -1,6 +1,5 @@
 package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 
-import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
 import org.bot.telegram.blackout_alerts.model.session.SessionState;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
@@ -50,11 +49,11 @@ public class StartHandler extends AbstractHandler {
             .build();
 
         return SendMessage.builder()
-            .text(EmojiParser.parseToUnicode("""
-                Привіт! З поверненням! :ua:
+            .text("""
+                Привіт! З поверненням! 🇺🇦
                 
-                Оберіть варіант з наведених нижче :arrow_down:
-                """))
+                Оберіть варіант з наведених нижче ⬇
+                """)
             .chatId(userSession.getChatId())
             .replyMarkup(keyboard)
             .build();
@@ -66,13 +65,13 @@ public class StartHandler extends AbstractHandler {
             .build();
 
         return SendMessage.builder()
-            .text(EmojiParser.parseToUnicode("""
-                Привіт! Вас вітає Blackout alers Bot :ua:
+            .text("""
+                Привіт! 🇺🇦
                 
-                Тут ви можете отримати актуальний графік відключень світла та підписатись на нагадування про відключення :bulb:
+                Тут ви можете отримати актуальний графік відключень світла та підписатись на нагадування про відключення 💡
                 
-                Для того, щоб почати, натисніть кнопку "Ввести адресу :multiple_houses:"
-                """))
+                Для того, щоб почати, натисніть кнопку "Ввести адресу 🏘"
+                """)
             .chatId(userSession.getChatId())
             .replyMarkup(keyboard)
             .build();

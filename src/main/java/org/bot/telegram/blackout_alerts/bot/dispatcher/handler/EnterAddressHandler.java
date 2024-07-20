@@ -5,7 +5,6 @@ import static org.bot.telegram.blackout_alerts.util.AddressUtil.parseHouseNumber
 import static org.bot.telegram.blackout_alerts.util.AddressUtil.parseKyivStreetPrefix;
 import static org.bot.telegram.blackout_alerts.util.ValidationUtil.validateTextInput;
 
-import com.vdurmont.emoji.EmojiParser;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
@@ -90,34 +89,32 @@ public class EnterAddressHandler extends AbstractHandler {
 
     protected static SendMessage getEnterCityMessage(UserSession userSession) {
         return SendMessage.builder()
-            .text(EmojiParser.parseToUnicode(":point_right: Введіть назву міста, наприклад - Київ"))
+            .text("👉 Введіть назву міста, наприклад - Київ")
             .chatId(userSession.getChatId())
             .build();
     }
 
     private static SendMessage getEnterKyivStreetMessage(UserSession userSession) {
         return SendMessage.builder()
-            .text(EmojiParser.parseToUnicode("""
-                :point_right: Введіть назву вулиці, наприклад - вулиця Хрещатик
+            .text("""
+                👉 Введіть назву вулиці, наприклад - вулиця Хрещатик
                 
                 Якщо це площа, проспект або бульвар - додайте на початок площа, проспект або бульвар замість вулиці відповідно
-                """))
+                """)
             .chatId(userSession.getChatId())
             .build();
     }
 
     private static SendMessage getEnterRegionStreetMessage(UserSession userSession) {
         return SendMessage.builder()
-            .text(EmojiParser.parseToUnicode("""
-                :point_right: Введіть назву вулиці, наприклад - Соборна
-                """))
+            .text("👉 Введіть назву вулиці, наприклад - Соборна ")
             .chatId(userSession.getChatId())
             .build();
     }
 
     private static SendMessage getEnterHouseMessage(UserSession userSession) {
         return SendMessage.builder()
-            .text(EmojiParser.parseToUnicode(":point_right: Введіть номер будинку, наприклад - 2б"))
+            .text("👉 Введіть номер будинку, наприклад - 2б")
             .chatId(userSession.getChatId())
             .build();
     }

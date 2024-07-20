@@ -1,6 +1,5 @@
 package org.bot.telegram.blackout_alerts.util;
 
-import com.vdurmont.emoji.EmojiParser;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -60,35 +59,35 @@ public class KeyboardBuilder {
 
     private static InlineKeyboardButton enterAddressButton() {
         InlineKeyboardButton button = new InlineKeyboardButton();
-        button.setText(EmojiParser.parseToUnicode("Ввести адресу :multiple_houses:"));
+        button.setText("Ввести адресу \uD83C\uDFD8");
         button.setCallbackData("/enter_address");
         return button;
     }
 
     private static InlineKeyboardButton changeAddressButton() {
         InlineKeyboardButton button = new InlineKeyboardButton();
-        button.setText(EmojiParser.parseToUnicode("Змінити адресу :arrows_counterclockwise:"));
+        button.setText("Змінити адресу \uD83D\uDD04");
         button.setCallbackData("/change_address");
         return button;
     }
 
     private static InlineKeyboardButton showAddressButton() {
         InlineKeyboardButton button = new InlineKeyboardButton();
-        button.setText(EmojiParser.parseToUnicode("Показати збережену адресу :eyes:"));
+        button.setText("Показати збережену адресу \uD83D\uDC40");
         button.setCallbackData("/show_address");
         return button;
     }
 
     private static InlineKeyboardButton showScheduleButton() {
         InlineKeyboardButton button = new InlineKeyboardButton();
-        button.setText(EmojiParser.parseToUnicode("Отримати графік на сьогодні :bulb:"));
+        button.setText("Отримати графік на сьогодні \uD83D\uDCA1");
         button.setCallbackData("/today_schedule");
         return button;
     }
 
     private static InlineKeyboardButton showWeekScheduleButton() {
         InlineKeyboardButton button = new InlineKeyboardButton();
-        button.setText(EmojiParser.parseToUnicode("Отримати графік на тиждень :calendar:"));
+        button.setText("Отримати графік на тиждень \uD83D\uDCC5");
         button.setCallbackData("/week_schedule");
         return button;
     }

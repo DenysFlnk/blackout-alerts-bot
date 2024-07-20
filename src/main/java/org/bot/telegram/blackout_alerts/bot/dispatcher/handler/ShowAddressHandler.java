@@ -1,6 +1,5 @@
 package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 
-import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
 import org.bot.telegram.blackout_alerts.model.session.SessionState;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
@@ -53,20 +52,18 @@ public class ShowAddressHandler extends AbstractHandler {
     }
 
     private static String getAddressMessage(UserSession userSession) {
-        String noEntry = EmojiParser.parseToUnicode("Не вказано :no_entry_sign:");
+        String noEntry = "Не вказано \uD83D\uDEAB";
 
         String city = userSession.getUserCity() != null ? userSession.getUserCity() : noEntry;
         String street = userSession.getUserStreet() != null ? userSession.getUserStreet() : noEntry;
         String house = userSession.getUserHouse() != null ? userSession.getUserHouse() : noEntry;
 
-        String message = String.format("""
-            :multiple_houses: Населенний пункт :arrow_right: %s
+        return String.format("""
+            🏘 Населенний пункт ➡ %s
             
-            :road: Вулиця :arrow_right: %s
+            🛣 Вулиця ➡ %s
             
-            :house: Будинок :arrow_right: %s
+            🏚 Будинок ➡ %s
             """, city, street, house);
-
-        return EmojiParser.parseToUnicode(message);
     }
 }

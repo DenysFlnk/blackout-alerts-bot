@@ -19,7 +19,6 @@
 		<telegram.bots.version>6.9.7.1</telegram.bots.version>
 		<selenium.version>4.22.0</selenium.version>
 		<gson.version>2.11.0</gson.version>
-		<emoji.version>5.1.1</emoji.version>
 		<web-driver-manager.version>5.9.1</web-driver-manager.version>
 	</properties>
 
@@ -63,13 +62,6 @@
 			<groupId>com.wagu</groupId>
 			<artifactId>com.wagu.tables</artifactId>
 			<version>1.0</version>
-		</dependency>
-
-		<!--Emoji support-->
-		<dependency>
-			<groupId>com.vdurmont</groupId>
-			<artifactId>emoji-java</artifactId>
-			<version>${emoji.version}</version>
 		</dependency>
 
 		<dependency>
