@@ -2,6 +2,7 @@ package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bot.telegram.blackout_alerts.exception.ShutdownStatusUnavailableException;
+import org.bot.telegram.blackout_alerts.exception.address.InvalidAddressException;
 import org.bot.telegram.blackout_alerts.model.session.SessionState;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.bot.telegram.blackout_alerts.service.ShutdownStatusService;
@@ -53,6 +54,11 @@ public class CheckShutdownStatusHandler extends AbstractHandler {
                 .text(e.getMessage())
                 .build();
             telegramService.sendMessage(message);
+        } catch (InvalidAddressException e) {
+            log.error("Chat id: {}. Invalid address for field {}, value {}", userSession.getChatId(),
+                e.getAddressField(), e.getFieldValue());
+            sendInvalidAddressMessage(userSession, e.getMessage());
+            return;
         }
 
         String textMessage = String.format("""
