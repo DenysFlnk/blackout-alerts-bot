@@ -8,6 +8,6 @@ public class WebDriverConfig {
 
     @PostConstruct
     private void locateWebDriver() {
-        System.setProperty("webdriver.chrome.driver", "/chromedriver");
+        System.setProperty("webdriver.chrome.driver", "/bot/chromedriver");
     }
 }
