@@ -41,6 +41,8 @@ COPY ./src/main/resources/chrome/chrome_125.0.6422.141-1.deb chrome.deb
 
 RUN dpkg -i chrome.deb && rm chrome.deb
 
+COPY ./src/main/resources/webdriver/chromedriver chromedriver
+
 COPY target/*.jar  blackout_alerts.jar
 
 ENTRYPOINT ["java", "-jar", "blackout_alerts.jar"]

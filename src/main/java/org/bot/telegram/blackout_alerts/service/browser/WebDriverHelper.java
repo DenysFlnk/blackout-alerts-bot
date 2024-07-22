@@ -2,11 +2,11 @@ package org.bot.telegram.blackout_alerts.service.browser;
 
 import static org.bot.telegram.blackout_alerts.util.AddressUtil.isKyiv;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.bot.telegram.blackout_alerts.util.BrowserPageUtil;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -52,7 +52,7 @@ public class WebDriverHelper {
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
 
-        return WebDriverManager.chromedriver().capabilities(options).create();
+        return new ChromeDriver(options);
     }
 
     private static WebDriverWait getPageAwait(WebDriver driver) {
