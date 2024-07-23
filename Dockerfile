@@ -7,7 +7,6 @@ RUN apt-get update \
     && apt-get install -y  \
         wget \
         unzip \
-        libgconf-2-4 \
         libnss3 \
         libnspr4 \
         libpango-1.0-0 \
@@ -26,7 +25,7 @@ RUN apt-get update \
         libx11-6 \
         libxcb1 \
         fonts-liberation \
-        libasound2 \
+        libasound2-data \
         libatk-bridge2.0-0 \
         libatk1.0-0 \
         libatspi2.0-0 \
@@ -37,8 +36,10 @@ RUN apt-get update \
         xdg-utils \
     && apt-get clean
 
-COPY chrome/chrome_125.0.6422.141-1.deb chrome.deb
+COPY libs/libasound2t64_1.2.11-1build2_amd64.deb libasound2.deb
+RUN dpkg -i libasound2.deb && rm libasound2.deb
 
+COPY chrome/chrome_125.0.6422.141-1.deb chrome.deb
 RUN dpkg -i chrome.deb && rm chrome.deb
 
 COPY webdriver/chromedriver /bot/chromedriver
