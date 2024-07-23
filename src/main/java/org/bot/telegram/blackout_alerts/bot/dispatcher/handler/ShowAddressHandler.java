@@ -46,6 +46,8 @@ public class ShowAddressHandler extends AbstractHandler {
                 .addShowWeekScheduleButton()
                 .build();
             messageBuilder.replyMarkup(keyboard);
+        } else {
+            messageBuilder.replyMarkup(KeyboardBuilder.builder().addReturnToMenuButton().build());
         }
 
         telegramService.sendMessage(messageBuilder.build());

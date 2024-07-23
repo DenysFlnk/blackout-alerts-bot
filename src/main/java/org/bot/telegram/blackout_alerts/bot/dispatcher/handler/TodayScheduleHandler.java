@@ -7,6 +7,7 @@ import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.bot.telegram.blackout_alerts.service.ScheduleService;
 import org.bot.telegram.blackout_alerts.service.TelegramService;
 import org.bot.telegram.blackout_alerts.service.UserSessionService;
+import org.bot.telegram.blackout_alerts.util.KeyboardBuilder;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
@@ -56,6 +57,7 @@ public class TodayScheduleHandler extends AbstractHandler {
         SendMessage sendMessage = SendMessage.builder()
             .chatId(userSession.getChatId())
             .parseMode("HTML")
+            .replyMarkup(KeyboardBuilder.builder().addReturnToMenuButton().build())
             .text(schedule)
             .build();
 

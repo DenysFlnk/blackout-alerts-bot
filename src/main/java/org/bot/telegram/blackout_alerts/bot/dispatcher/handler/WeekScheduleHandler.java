@@ -10,6 +10,7 @@ import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.bot.telegram.blackout_alerts.service.ScheduleService;
 import org.bot.telegram.blackout_alerts.service.TelegramService;
 import org.bot.telegram.blackout_alerts.service.UserSessionService;
+import org.bot.telegram.blackout_alerts.util.KeyboardBuilder;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
@@ -65,6 +66,7 @@ public class WeekScheduleHandler extends AbstractHandler {
             .chatId(userSession.getChatId())
             .caption(getCaption(userSession))
             .photo(file)
+            .replyMarkup(KeyboardBuilder.builder().addReturnToMenuButton().build())
             .build();
 
         telegramService.sendPhoto(photo);

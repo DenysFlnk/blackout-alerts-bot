@@ -69,14 +69,10 @@ public class CheckShutdownStatusHandler extends AbstractHandler {
             ➖➖➖➖➖➖➖➖➖➖➖➖
             """, userSession.getUserCity(), userSession.getUserStreet(), userSession.getUserHouse(), status);
 
-        KeyboardBuilder keyboard = KeyboardBuilder.builder()
-            .addShowScheduleButton()
-            .addShowWeekScheduleButton();
-
         SendMessage message = SendMessage.builder()
             .chatId(userSession.getChatId())
             .text(textMessage)
-            .replyMarkup(keyboard.build())
+            .replyMarkup(KeyboardBuilder.builder().addReturnToMenuButton().build())
             .build();
 
         telegramService.sendMessage(message);

@@ -14,6 +14,7 @@ public class KeyboardBuilder {
     private static final InlineKeyboardButton showScheduleButton = showScheduleButton();
     private static final InlineKeyboardButton showWeekScheduleButton = showWeekScheduleButton();
     private static final InlineKeyboardButton checkShutdownStatusButton = checkShutdownStatusButton();
+    private static final InlineKeyboardButton returnToMenuButton = returnToMenuButton();
 
     private final List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
@@ -48,6 +49,11 @@ public class KeyboardBuilder {
 
     public KeyboardBuilder addCheckShutdownStatusButton() {
         keyboard.add(Collections.singletonList(checkShutdownStatusButton));
+        return this;
+    }
+
+    public KeyboardBuilder addReturnToMenuButton() {
+        keyboard.add(Collections.singletonList(returnToMenuButton));
         return this;
     }
 
@@ -96,6 +102,13 @@ public class KeyboardBuilder {
         InlineKeyboardButton button = new InlineKeyboardButton();
         button.setText("Перевірити поточний статус відключення \uD83D\uDD0E");
         button.setCallbackData("/check_shutdown_status");
+        return button;
+    }
+
+    private static InlineKeyboardButton returnToMenuButton() {
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText("Повернутись до меню \uD83D\uDCF2");
+        button.setCallbackData("/menu");
         return button;
     }
 }
