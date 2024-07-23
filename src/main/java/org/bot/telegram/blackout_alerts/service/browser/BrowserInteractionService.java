@@ -10,6 +10,7 @@ import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.JS_SCROLL_IN
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_CITY_AUTOCOMPLETE_FORMAT;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_CITY_AUTOCOMPLETE_LIST;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_CITY_INPUT;
+import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_CLOSE_MODAL_BTN;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_AUTOCOMPLETE;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_INPUT;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_SCHEDULE_TABLE;
@@ -17,8 +18,10 @@ import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_SHUTDO
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_AUTOCOMPLETE;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_AUTOCOMPLETE_STRICT_FORMAT;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_INPUT;
-import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.awaitAndCloseModal;
+import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.awaitForAny;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.dtekPageIsReady;
+import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.elementIsVisible;
+import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.modalIsPresent;
 import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 
@@ -141,13 +144,21 @@ public class BrowserInteractionService {
 
     private void awaitForDtekPage() {
         try {
-            awaitAndCloseModal(autocompleteAwait);
-            pageAwait.until(dtekPageIsReady());
+            awaitForAny(pageAwait, dtekPageIsReady(), modalIsPresent());
+
+            if (elementIsVisible(driver, XPATH_CLOSE_MODAL_BTN)) {
+                log.debug("Modal window is present");
+                driver.findElement(By.xpath(XPATH_CLOSE_MODAL_BTN)).click();
+            }
         } catch (WebDriverException e) {
             log.warn("Failed to await dtek page. Trying again");
             driver.navigate().refresh();
-            awaitAndCloseModal(autocompleteAwait);
-            pageAwait.until(dtekPageIsReady());
+            awaitForAny(pageAwait, dtekPageIsReady(), modalIsPresent());
+
+            if (elementIsVisible(driver, XPATH_CLOSE_MODAL_BTN)) {
+                log.debug("Modal window is present after refresh");
+                driver.findElement(By.xpath(XPATH_CLOSE_MODAL_BTN)).click();
+            }
         }
     }
 

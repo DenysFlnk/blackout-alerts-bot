@@ -2,9 +2,13 @@ package org.bot.telegram.blackout_alerts.util;
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.*;
 
+import java.util.Arrays;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -41,13 +45,25 @@ public class BrowserPageUtil {
 
     public static final String JS_SCROLL_INTO_VIEW = "arguments[0].scrollIntoView({block: 'center'});";
 
-    public static void awaitAndCloseModal(WebDriverWait await) {
+    public static void awaitForAny(WebDriverWait wait, ExpectedCondition<?> ... conditions) {
         try {
-            await.until(visibilityOfElementLocated(By.xpath(XPATH_CLOSE_MODAL_BTN))).click();
-            log.info("Found modal window");
+            wait.until(input -> {
+               for (ExpectedCondition<?> condition : conditions) {
+                   boolean conditionIsPresent = Boolean.TRUE.equals(condition.apply(input));
+                   if (conditionIsPresent) {
+                       return true;
+                   }
+               }
+               return false;
+            });
         } catch (WebDriverException e) {
-            log.info("Modal window not found");
+            log.warn("Failed to await for any conditions: {}", Arrays.toString(conditions));
+            throw e;
         }
+    }
+
+    public static ExpectedCondition<Boolean> modalIsPresent() {
+        return and(visibilityOfElementLocated(By.xpath(XPATH_CLOSE_MODAL_BTN)));
     }
 
     public static ExpectedCondition<Boolean> dtekPageIsReady() {
@@ -55,5 +71,10 @@ public class BrowserPageUtil {
             visibilityOfElementLocated(By.xpath(XPATH_STREET_INPUT)),
             visibilityOfElementLocated(By.xpath(XPATH_HOUSE_INPUT))
         );
+    }
+
+    public static boolean elementIsVisible(WebDriver driver, String xpath) {
+        List<WebElement> elements = driver.findElements(By.xpath(xpath));
+        return !elements.isEmpty() && elements.get(0).isDisplayed();
     }
 }
