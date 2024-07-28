@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS user_info;
 DROP TABLE IF EXISTS address;
 DROP TABLE IF EXISTS zone_schedule;
 DROP TABLE IF EXISTS announcement;
+DROP TABLE IF EXISTS alert_subscription;
 
 CREATE TABLE user_info
 (
@@ -33,4 +34,11 @@ CREATE TABLE announcement
     id           SERIAL PRIMARY KEY NOT NULL,
     text         VARCHAR            NOT NULL,
     is_announced BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE alert_subscription
+(
+    chat_id      BIGINT PRIMARY KEY NOT NULL,
+    address_id   INTEGER NOT NULL,
+    FOREIGN KEY(address_id) REFERENCES address(id)
 );

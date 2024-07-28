@@ -65,7 +65,7 @@ public class ScheduleService {
         return Optional.empty();
     }
 
-    private Schedule getShutdownScheduleFromWeb(UserSession session) {
+    protected Schedule getShutdownScheduleFromWeb(UserSession session) {
         log.info("Chat id: {}. Getting shutdown schedule from web", session.getChatId());
         try {
             String scheduleJson = browserService.getShutDownSchedule(session);

@@ -129,6 +129,7 @@ public class EnterAddressHandler extends AbstractHandler {
             .addCheckShutdownStatusButton()
             .addShowScheduleButton()
             .addShowWeekScheduleButton()
+            .addManageAlertSubscriptionButton()
             .addChangeAddressButton()
             .build();
 

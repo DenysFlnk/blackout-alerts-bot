@@ -50,6 +50,7 @@ public class ShowAddressHandler extends AbstractHandler {
                 .addCheckShutdownStatusButton()
                 .addShowScheduleButton()
                 .addShowWeekScheduleButton()
+                .addManageAlertSubscriptionButton()
                 .build();
             messageBuilder.replyMarkup(keyboard);
         } else {

@@ -17,6 +17,9 @@ public class KeyboardBuilder {
     private static final InlineKeyboardButton checkShutdownStatusButton = checkShutdownStatusButton();
     private static final InlineKeyboardButton returnToMenuButton = returnToMenuButton();
     private static final InlineKeyboardButton answerToUserButton = answerToUserButton();
+    private static final InlineKeyboardButton manageAlertSubscriptionButton = manageAlertSubscriptionButton();
+    private static final InlineKeyboardButton createAlertSubscriptionButton = createAlertSubscriptionButton();
+    private static final InlineKeyboardButton deleteAlertSubscriptionButton = deleteAlertSubscriptionButton();
 
     private final List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
@@ -84,6 +87,21 @@ public class KeyboardBuilder {
         return this;
     }
 
+    public KeyboardBuilder addManageAlertSubscriptionButton() {
+        keyboard.add(Collections.singletonList(manageAlertSubscriptionButton));
+        return this;
+    }
+
+    public KeyboardBuilder addCreateAlertSubscriptionButton() {
+        keyboard.add(Collections.singletonList(createAlertSubscriptionButton));
+        return this;
+    }
+
+    public KeyboardBuilder addDeleteAlertSubscriptionButton() {
+        keyboard.add(Collections.singletonList(deleteAlertSubscriptionButton));
+        return this;
+    }
+
     public InlineKeyboardMarkup build() {
         return InlineKeyboardMarkup.builder()
             .keyboard(keyboard)
@@ -143,6 +161,27 @@ public class KeyboardBuilder {
         InlineKeyboardButton button = new InlineKeyboardButton();
         button.setText("Відповісти на питання ❔");
         button.setCallbackData("/answer_to_user");
+        return button;
+    }
+
+    private static InlineKeyboardButton manageAlertSubscriptionButton() {
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText("Керувати сповіщеннями про відключення \uD83D\uDCEC");
+        button.setCallbackData("/manage_subscription");
+        return button;
+    }
+
+    private static InlineKeyboardButton createAlertSubscriptionButton() {
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText("Підписатись на сповіщення  📳");
+        button.setCallbackData("/alert_subscription");
+        return button;
+    }
+
+    private static InlineKeyboardButton deleteAlertSubscriptionButton() {
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText("Відписатись від сповіщення 📵");
+        button.setCallbackData("/remove_alert_subscription");
         return button;
     }
 }

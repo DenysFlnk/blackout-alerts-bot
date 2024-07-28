@@ -20,7 +20,7 @@ public class AddressService {
 
     private final AddressEntityRepository addressRepository;
 
-    public Optional<Address> getAddressFromDb(UserSession session) {
+    protected Optional<Address> getAddressFromDb(UserSession session) {
         List<AddressEntity> addresses = addressRepository.findAllByCityContainsAndStreetContainsAndHouse(
             session.getUserCity(), session.getUserStreet(), session.getUserHouse());
 
@@ -45,10 +45,19 @@ public class AddressService {
         }
     }
 
-    public void updateAddressInDb(UserSession session) {
+    protected void updateAddressInDb(UserSession session) {
         AddressEntity address = UserSessionUtil.getAddressEntity(session);
         addressRepository.findByCityAndStreetAndHouse(address.getCity(), address.getStreet(), address.getHouse())
             .ifPresent(addressEntity -> address.setId(addressEntity.getId()));
         addressRepository.save(address);
+    }
+
+    protected AddressEntity getAddressEntity(UserSession userSession) {
+        String city = userSession.getUserCity();
+        String street = userSession.getUserStreet();
+        String house = userSession.getUserHouse();
+
+        return addressRepository.findByCityAndStreetAndHouse(city, street, house).orElseGet(() ->
+            addressRepository.findAllByCityContainsAndStreetContainsAndHouse(city, street, house).get(0));
     }
 }
