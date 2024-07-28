@@ -40,12 +40,13 @@ public class WeekScheduleHandler extends AbstractHandler {
         log.info("Chat id: {}. Session state: {}. Text: {}", userSession.getChatId(), userSession.getSessionState(),
             userSession.getText());
 
-        if (!SessionState.ADDRESS_ACQUIRED.equals(userSession.getSessionState())) {
+        if (!SessionState.ADDRESS_ACQUIRED_STATES.contains(userSession.getSessionState())) {
             log.warn("Chat id: {}. Address not acquired", userSession.getChatId());
             sendAddressNotAcquiredMessage(userSession);
             return;
         }
 
+        userSession.setSessionState(SessionState.WEEK_SCHEDULE);
         sendScheduleLoadingMessage(userSession);
 
         ByteArrayInputStream screenshot;
@@ -54,8 +55,10 @@ public class WeekScheduleHandler extends AbstractHandler {
         } catch (InvalidAddressException e) {
             log.error("Chat id: {}. Invalid address for field {}, value {}", userSession.getChatId(),
                 e.getAddressField(), e.getFieldValue());
-            sendInvalidAddressMessage(userSession, e.getMessage());
+            sendInvalidAddressMessage(userSession, e);
             return;
+        } finally {
+            userSessionService.saveUserSession(userSession);
         }
 
         String fileName = String.format("%s_withAddress_%s_%s_%s_date_%s", userSession.getChatId(),
@@ -70,7 +73,6 @@ public class WeekScheduleHandler extends AbstractHandler {
             .build();
 
         telegramService.sendPhoto(photo);
-        userSessionService.saveUserSession(userSession);
     }
 
     public static String getCaption(UserSession userSession) {

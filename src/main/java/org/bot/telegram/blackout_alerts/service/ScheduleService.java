@@ -5,25 +5,19 @@ import static org.bot.telegram.blackout_alerts.util.ScheduleUtil.renderTodaySche
 
 import java.io.ByteArrayInputStream;
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bot.telegram.blackout_alerts.exception.address.InvalidAddressException;
-import org.bot.telegram.blackout_alerts.model.entity.AddressEntity;
 import org.bot.telegram.blackout_alerts.model.entity.Zone;
 import org.bot.telegram.blackout_alerts.model.entity.ZoneSchedule;
 import org.bot.telegram.blackout_alerts.model.schedule.Schedule;
 import org.bot.telegram.blackout_alerts.model.session.Address;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
-import org.bot.telegram.blackout_alerts.repository.AddressEntityRepository;
 import org.bot.telegram.blackout_alerts.repository.ZoneScheduleRepository;
 import org.bot.telegram.blackout_alerts.service.browser.BrowserInteractionService;
 import org.bot.telegram.blackout_alerts.util.ScheduleUtil;
-import org.bot.telegram.blackout_alerts.util.UserSessionUtil;
 import org.openqa.selenium.WebDriverException;
 import org.springframework.stereotype.Service;
 
@@ -82,8 +76,8 @@ public class ScheduleService {
             log.info("Chat id: {}. Success getting shutdown schedule from web", userSession.getChatId());
             return parseSchedule(scheduleJson, userSession.getShutdownGroup());
         } catch (WebDriverException | InvalidAddressException e) {
-            log.warn("Chat id: {}. Got an exception while getting shutdown schedule from web. "
-                + "Trying to find address in DB", userSession.getChatId(), e);
+            log.warn("Chat id: {}. Got an '{}' while getting shutdown schedule from web. "
+                + "Trying to find address in DB", userSession.getChatId(), e.getClass().getSimpleName());
             Optional<Address> addressOptional = addressService.getAddressFromDb(userSession);
 
             if (addressOptional.isPresent()) {

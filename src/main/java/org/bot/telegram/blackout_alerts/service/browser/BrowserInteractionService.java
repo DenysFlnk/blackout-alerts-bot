@@ -12,6 +12,7 @@ import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_CITY_A
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_CITY_INPUT;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_CLOSE_MODAL_BTN;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_AUTOCOMPLETE;
+import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_AUTOCOMPLETE_LIST;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_INPUT;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_SCHEDULE_TABLE;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_SHUTDOWN_STATUS;
@@ -27,6 +28,8 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElem
 
 import java.io.ByteArrayInputStream;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -283,7 +286,12 @@ public class BrowserInteractionService {
         try {
             houseAutocomplete = getAutocompleteInput(input, XPATH_HOUSE_AUTOCOMPLETE, userHouse);
         } catch (IllegalArgumentException e) {
-            throw new InvalidAddressException(AddressField.HOUSE, userHouse);
+            String firstDigit = userHouse.substring(0, 1);
+            fillInput(input, firstDigit);
+            List<String> options = new ArrayList<>();
+            driver.findElements(By.xpath(XPATH_HOUSE_AUTOCOMPLETE_LIST))
+                .forEach(element -> options.add(element.getText()));
+            throw new InvalidAddressException(AddressField.HOUSE, userHouse, options);
         }
 
         if (!userHouse.equals(houseAutocomplete)) {

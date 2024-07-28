@@ -33,6 +33,7 @@ public class BrowserPageUtil {
     public static final String XPATH_HOUSE_INPUT = "//form[@id='discon_form']//input[@id='house_num']";
     public static final String XPATH_HOUSE_AUTOCOMPLETE =
         "//div[contains(@id,'house_numautocomplete-list')]/div[not(text())]";
+    public static final String XPATH_HOUSE_AUTOCOMPLETE_LIST = "//div[contains(@id,'house_numautocomplete-list')]/div";
 
     public static final String XPATH_CLOSE_MODAL_BTN = "//button[contains(@class,'modal__close')]";
 

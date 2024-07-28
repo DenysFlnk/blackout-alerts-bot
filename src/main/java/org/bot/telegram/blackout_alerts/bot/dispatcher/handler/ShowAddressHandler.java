@@ -39,7 +39,7 @@ public class ShowAddressHandler extends AbstractHandler {
             .chatId(userSession.getChatId())
             .text(message);
 
-        if (SessionState.ADDRESS_ACQUIRED.equals(userSession.getSessionState())) {
+        if (SessionState.ADDRESS_ACQUIRED_STATES.contains(userSession.getSessionState())) {
             InlineKeyboardMarkup keyboard = KeyboardBuilder.builder()
                 .addCheckShutdownStatusButton()
                 .addShowScheduleButton()

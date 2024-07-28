@@ -5,8 +5,6 @@ import static org.bot.telegram.blackout_alerts.util.AddressUtil.parseHouseNumber
 import static org.bot.telegram.blackout_alerts.util.AddressUtil.parseKyivStreetPrefix;
 import static org.bot.telegram.blackout_alerts.util.ValidationUtil.validateTextInput;
 
-import java.util.HashSet;
-import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.bot.telegram.blackout_alerts.model.session.SessionState;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
@@ -23,19 +21,14 @@ public class EnterAddressHandler extends AbstractHandler {
 
     private static final String ENTER_ADDRESS = "/enter_address";
 
-    private final Set<SessionState> allowedStates = new HashSet<>();
-
     public EnterAddressHandler(TelegramService telegramService, UserSessionService userSessionService) {
         super(telegramService, userSessionService);
-
-        allowedStates.add(SessionState.WAIT_FOR_CITY);
-        allowedStates.add(SessionState.WAIT_FOR_STREET);
-        allowedStates.add(SessionState.WAIT_FOR_HOUSE_NUMBER);
     }
 
     @Override
     public boolean isHandleable(UserSession userSession) {
-        return ENTER_ADDRESS.equals(userSession.getText()) || allowedStates.contains(userSession.getSessionState());
+        return ENTER_ADDRESS.equals(userSession.getText()) ||
+               SessionState.WAIT_FOR_INPUTS.contains(userSession.getSessionState());
     }
 
     @Override
@@ -73,7 +66,7 @@ public class EnterAddressHandler extends AbstractHandler {
             }
             case WAIT_FOR_HOUSE_NUMBER -> {
                 log.info("Chat id: {}. Entered house: {}", userSession.getChatId(), userSession.getText());
-                String house = parseHouseNumber(userSession.getText()).toUpperCase();
+                String house = parseHouseNumber(userSession.getText());
                 userSession.setUserHouse(house);
                 message = getAddressAcquiredMessage(userSession);
                 userSession.setSessionState(SessionState.ADDRESS_ACQUIRED);

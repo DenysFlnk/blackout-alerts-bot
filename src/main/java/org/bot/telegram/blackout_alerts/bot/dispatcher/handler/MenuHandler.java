@@ -32,7 +32,7 @@ public class MenuHandler extends AbstractHandler {
 
         KeyboardBuilder keyboardBuilder = KeyboardBuilder.builder();
 
-        if (userSession.getSessionState().equals(SessionState.ADDRESS_ACQUIRED)) {
+        if (SessionState.ADDRESS_ACQUIRED_STATES.contains(userSession.getSessionState())) {
             keyboardBuilder.addShowAddressButton()
                 .addChangeAddressButton()
                 .addShowScheduleButton()

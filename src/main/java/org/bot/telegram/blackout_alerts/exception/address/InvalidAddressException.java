@@ -1,9 +1,8 @@
 package org.bot.telegram.blackout_alerts.exception.address;
 
+import java.util.List;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 @Getter
 public class InvalidAddressException extends IllegalArgumentException {
 
@@ -39,6 +38,20 @@ public class InvalidAddressException extends IllegalArgumentException {
     private final AddressField addressField;
 
     private final String fieldValue;
+
+    private final List<String> availableOptions;
+
+    public InvalidAddressException(AddressField addressField, String fieldValue) {
+        this.addressField = addressField;
+        this.fieldValue = fieldValue;
+        this.availableOptions = null;
+    }
+
+    public InvalidAddressException(AddressField addressField, String fieldValue, List<String> availableOptions) {
+        this.addressField = addressField;
+        this.fieldValue = fieldValue;
+        this.availableOptions = availableOptions;
+    }
 
     @Override
     public String getMessage() {

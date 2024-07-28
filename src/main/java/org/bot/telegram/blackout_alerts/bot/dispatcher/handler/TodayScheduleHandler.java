@@ -36,12 +36,13 @@ public class TodayScheduleHandler extends AbstractHandler {
         log.info("Chat id: {}. Session state: {}. Text: {}", userSession.getChatId(), userSession.getSessionState(),
             userSession.getText());
 
-        if (!SessionState.ADDRESS_ACQUIRED.equals(userSession.getSessionState())) {
+        if (!SessionState.ADDRESS_ACQUIRED_STATES.contains(userSession.getSessionState())) {
             log.warn("Chat id: {}. Address not acquired", userSession.getChatId());
             sendAddressNotAcquiredMessage(userSession);
             return;
         }
 
+        userSession.setSessionState(SessionState.TODAY_SCHEDULE);
         sendScheduleLoadingMessage(userSession);
 
         String schedule;
@@ -50,8 +51,10 @@ public class TodayScheduleHandler extends AbstractHandler {
         } catch (InvalidAddressException e) {
             log.error("Chat id: {}. Invalid address for field {}, value {}", userSession.getChatId(),
                 e.getAddressField(), e.getFieldValue());
-            sendInvalidAddressMessage(userSession, e.getMessage());
+            sendInvalidAddressMessage(userSession, e);
             return;
+        } finally {
+            userSessionService.saveUserSession(userSession);
         }
 
         SendMessage sendMessage = SendMessage.builder()
@@ -62,6 +65,5 @@ public class TodayScheduleHandler extends AbstractHandler {
             .build();
 
         telegramService.sendMessage(sendMessage);
-        userSessionService.saveUserSession(userSession);
     }
 }

@@ -1,10 +1,15 @@
 package org.bot.telegram.blackout_alerts.util;
 
+import java.util.Arrays;
+import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
+import org.bot.telegram.blackout_alerts.exception.address.AddressField;
 import org.bot.telegram.blackout_alerts.model.entity.AddressEntity;
 import org.bot.telegram.blackout_alerts.model.entity.UserInfo;
 import org.bot.telegram.blackout_alerts.model.session.Address;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
 
+@Slf4j
 public class UserSessionUtil {
 
     private UserSessionUtil() {
@@ -48,5 +53,28 @@ public class UserSessionUtil {
         address.setHouse(addressEntity.getHouse());
         address.setShutdownGroup(addressEntity.getShutdownGroup());
         return address;
+    }
+
+    public static void handleAddressCorrection(UserSession userSession) {
+        Optional<AddressField> field = Arrays.stream(AddressField.values())
+            .filter(addressField -> userSession.getText().contains(addressField.toString()))
+            .findAny();
+
+        if (field.isEmpty()) {
+            return;
+        }
+
+        AddressField addressField = field.get();
+        String updatedAddress = userSession.getText().replace(addressField.toString(), "").trim();
+        log.info("Chat id: {}. Replace {} to new value {}", userSession.getChatId(), addressField, updatedAddress);
+
+        switch (addressField) {
+            case CITY -> userSession.setUserCity(updatedAddress);
+            case STREET -> userSession.setUserStreet(updatedAddress);
+            case HOUSE -> userSession.setUserHouse(updatedAddress);
+            default -> log.warn("Address field {} not found", addressField);
+        }
+
+        userSession.setText("/" + userSession.getSessionState().toString().toLowerCase());
     }
 }

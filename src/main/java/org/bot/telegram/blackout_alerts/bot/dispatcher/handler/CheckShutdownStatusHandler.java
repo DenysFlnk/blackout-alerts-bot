@@ -37,15 +37,16 @@ public class CheckShutdownStatusHandler extends AbstractHandler {
         log.info("Chat id: {}. Session state: {}. Text: {}", userSession.getChatId(), userSession.getSessionState(),
             userSession.getText());
 
-        if (!SessionState.ADDRESS_ACQUIRED.equals(userSession.getSessionState())) {
+        if (!SessionState.ADDRESS_ACQUIRED_STATES.contains(userSession.getSessionState())) {
             log.warn("Chat id: {}. Address not acquired", userSession.getChatId());
             sendAddressNotAcquiredMessage(userSession);
             return;
         }
 
+        userSession.setSessionState(SessionState.CHECK_SHUTDOWN_STATUS);
         sendStatusLoadingMessage(userSession);
 
-        String status = null;
+        String status;
         try {
             status = shutdownStatusService.getShutdownStatus(userSession);
         } catch (ShutdownStatusUnavailableException e) {
@@ -54,11 +55,14 @@ public class CheckShutdownStatusHandler extends AbstractHandler {
                 .text(e.getMessage())
                 .build();
             telegramService.sendMessage(message);
+            return;
         } catch (InvalidAddressException e) {
             log.error("Chat id: {}. Invalid address for field {}, value {}", userSession.getChatId(),
                 e.getAddressField(), e.getFieldValue());
-            sendInvalidAddressMessage(userSession, e.getMessage());
+            sendInvalidAddressMessage(userSession, e);
             return;
+        } finally {
+            userSessionService.saveUserSession(userSession);
         }
 
         String textMessage = String.format("""
@@ -76,7 +80,6 @@ public class CheckShutdownStatusHandler extends AbstractHandler {
             .build();
 
         telegramService.sendMessage(message);
-        userSessionService.saveUserSession(userSession);
     }
 
     private void sendStatusLoadingMessage(UserSession userSession) {

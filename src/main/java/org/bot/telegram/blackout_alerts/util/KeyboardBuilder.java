@@ -3,6 +3,7 @@ package org.bot.telegram.blackout_alerts.util;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.bot.telegram.blackout_alerts.exception.address.AddressField;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
@@ -54,6 +55,26 @@ public class KeyboardBuilder {
 
     public KeyboardBuilder addReturnToMenuButton() {
         keyboard.add(Collections.singletonList(returnToMenuButton));
+        return this;
+    }
+
+    public KeyboardBuilder addAddressOptions(AddressField field, List<String> options) {
+        String callbackFormat = "%s %s";
+
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        int maxSize = options.size() > 12 ? 3 : 2;
+        for (String option : options) {
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            button.setText(option);
+            button.setCallbackData(String.format(callbackFormat, field, option));
+
+            if (row.size() == maxSize) {
+                keyboard.add(row);
+                row = new ArrayList<>();
+            }
+            row.add(button);
+        }
+
         return this;
     }
 
