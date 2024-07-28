@@ -3,7 +3,8 @@ package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 import static org.bot.telegram.blackout_alerts.util.AddressUtil.isKyiv;
 import static org.bot.telegram.blackout_alerts.util.AddressUtil.parseHouseNumber;
 import static org.bot.telegram.blackout_alerts.util.AddressUtil.parseKyivStreetPrefix;
-import static org.bot.telegram.blackout_alerts.util.ValidationUtil.validateTextInput;
+import static org.bot.telegram.blackout_alerts.util.ValidationUtil.validateCityInput;
+import static org.bot.telegram.blackout_alerts.util.ValidationUtil.validateStreetInput;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bot.telegram.blackout_alerts.model.session.SessionState;
@@ -50,7 +51,7 @@ public class EnterAddressHandler extends AbstractHandler {
             case WAIT_FOR_CITY -> {
                 log.info("Chat id: {}. Entered city: {}", userSession.getChatId(), userSession.getText());
                 String city = userSession.getText();
-                validateTextInput(city);
+                validateCityInput(city);
                 userSession.setUserCity(city);
                 message = isKyiv(city) ? getEnterKyivStreetMessage(userSession) : getEnterRegionStreetMessage(userSession);
                 userSession.setSessionState(SessionState.WAIT_FOR_STREET);
@@ -58,7 +59,7 @@ public class EnterAddressHandler extends AbstractHandler {
             case WAIT_FOR_STREET -> {
                 log.info("Chat id: {}. Entered street: {}", userSession.getChatId(), userSession.getText());
                 String text = userSession.getText();
-                validateTextInput(text);
+                validateStreetInput(text);
                 String street = isKyiv(userSession.getUserCity()) ? parseKyivStreetPrefix(text) : text;
                 userSession.setUserStreet(street);
                 message = getEnterHouseMessage(userSession);
