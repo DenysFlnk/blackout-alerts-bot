@@ -1,8 +1,5 @@
 package org.bot.telegram.blackout_alerts.service;
 
-import static org.bot.telegram.blackout_alerts.util.UserSessionUtil.getAddress;
-import static org.bot.telegram.blackout_alerts.util.UserSessionUtil.getAddressEntity;
-
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +10,7 @@ import org.bot.telegram.blackout_alerts.model.entity.AddressEntity;
 import org.bot.telegram.blackout_alerts.model.session.Address;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.bot.telegram.blackout_alerts.repository.AddressEntityRepository;
+import org.bot.telegram.blackout_alerts.util.UserSessionUtil;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -41,14 +39,14 @@ public class AddressService {
             sortedAddresses.forEach(address -> addressRepository.deleteById(address.getId()));
 
             log.info("Latest address: {}, {}, {}", result.getCity(), result.getStreet(), result.getHouse());
-            return Optional.of(getAddress(result));
+            return Optional.of(UserSessionUtil.getAddress(result));
         } else {
-            return Optional.of(getAddress(addresses.get(0)));
+            return Optional.of(UserSessionUtil.getAddress(addresses.get(0)));
         }
     }
 
     public void updateAddressInDb(UserSession userSession) {
-        AddressEntity address = getAddressEntity(userSession);
+        AddressEntity address = UserSessionUtil.getAddressEntity(userSession);
         addressRepository.findByCityAndStreetAndHouse(address.getCity(), address.getStreet(), address.getHouse())
             .ifPresent(addressEntity -> address.setId(addressEntity.getId()));
         addressRepository.save(address);
