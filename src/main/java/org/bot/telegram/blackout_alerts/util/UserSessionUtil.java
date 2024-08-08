@@ -27,22 +27,22 @@ public class UserSessionUtil {
         return session;
     }
 
-    public static UserInfo getUserInfo(UserSession userSession) {
+    public static UserInfo getUserInfo(UserSession session) {
         UserInfo userInfo = new UserInfo();
-        userInfo.setChatId(userSession.getChatId());
-        userInfo.setSessionState(userSession.getSessionState());
-        userInfo.setUserCity(userSession.getUserCity());
-        userInfo.setUserStreet(userSession.getUserStreet());
-        userInfo.setUserHouse(userSession.getUserHouse());
+        userInfo.setChatId(session.getChatId());
+        userInfo.setSessionState(session.getSessionState());
+        userInfo.setUserCity(session.getUserCity());
+        userInfo.setUserStreet(session.getUserStreet());
+        userInfo.setUserHouse(session.getUserHouse());
         return userInfo;
     }
 
-    public static AddressEntity getAddressEntity(UserSession userSession) {
+    public static AddressEntity getAddressEntity(UserSession session) {
         AddressEntity addressEntity = new AddressEntity();
-        addressEntity.setCity(userSession.getUserCity());
-        addressEntity.setStreet(userSession.getUserStreet());
-        addressEntity.setHouse(userSession.getUserHouse());
-        addressEntity.setShutdownGroup(userSession.getShutdownGroup());
+        addressEntity.setCity(session.getUserCity());
+        addressEntity.setStreet(session.getUserStreet());
+        addressEntity.setHouse(session.getUserHouse());
+        addressEntity.setShutdownGroup(session.getShutdownGroup());
         return addressEntity;
     }
 
@@ -55,9 +55,9 @@ public class UserSessionUtil {
         return address;
     }
 
-    public static void handleAddressCorrection(UserSession userSession) {
+    public static void handleAddressCorrection(UserSession session) {
         Optional<AddressField> field = Arrays.stream(AddressField.values())
-            .filter(addressField -> userSession.getText().contains(addressField.toString()))
+            .filter(addressField -> session.getText().contains(addressField.toString()))
             .findAny();
 
         if (field.isEmpty()) {
@@ -65,16 +65,16 @@ public class UserSessionUtil {
         }
 
         AddressField addressField = field.get();
-        String updatedAddress = userSession.getText().replace(addressField.toString(), "").trim();
-        log.info("Chat id: {}. Replace {} to new value {}", userSession.getChatId(), addressField, updatedAddress);
+        String updatedAddress = session.getText().replace(addressField.toString(), "").trim();
+        log.info("Chat id: {}. Replace {} to new value {}", session.getChatId(), addressField, updatedAddress);
 
         switch (addressField) {
-            case CITY -> userSession.setUserCity(updatedAddress);
-            case STREET -> userSession.setUserStreet(updatedAddress);
-            case HOUSE -> userSession.setUserHouse(updatedAddress);
+            case CITY -> session.setUserCity(updatedAddress);
+            case STREET -> session.setUserStreet(updatedAddress);
+            case HOUSE -> session.setUserHouse(updatedAddress);
             default -> log.warn("Address field {} not found", addressField);
         }
 
-        userSession.setText("/" + userSession.getSessionState().toString().toLowerCase());
+        session.setText("/" + session.getSessionState().toString().toLowerCase());
     }
 }

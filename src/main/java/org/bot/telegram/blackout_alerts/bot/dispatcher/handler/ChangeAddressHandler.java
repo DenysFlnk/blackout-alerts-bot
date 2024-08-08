@@ -26,9 +26,7 @@ public class ChangeAddressHandler extends AbstractHandler {
 
     @Override
     public void handle(UserSession userSession) {
-        log.info("Chat id: {}. ChangeAddressHandler.handle()", userSession.getChatId());
-        log.info("Chat id: {}. Session state: {}. Text: {}", userSession.getChatId(), userSession.getSessionState(),
-            userSession.getText());
+        logStartHandle(userSession);
 
         userSession.setAddress(new Address());
         userSession.setSessionState(SessionState.WAIT_FOR_CITY);

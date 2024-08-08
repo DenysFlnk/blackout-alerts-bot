@@ -60,20 +60,20 @@ public class BrowserInteractionService {
 
     private WebDriverWait autocompleteAwait;
 
-    public String getShutDownSchedule(UserSession userSession) {
-        String userCity = userSession.getUserCity();
+    public String getShutDownSchedule(UserSession session) {
+        String userCity = session.getUserCity();
         acquireWebDriverWithAwaits(this, userCity);
         awaitForDtekPage();
 
         String schedule;
         try {
             if (isKyiv(userCity)) {
-                fillKyivInputs(userSession);
+                fillKyivInputs(session);
             } else {
-                fillRegionInputs(userSession);
+                fillRegionInputs(session);
             }
 
-            setShutdownGroupByJS(userSession);
+            setShutdownGroupByJS(session);
             schedule = getScheduleByJS();
         } finally {
             releaseWebDriverWithAwaits(this);
@@ -82,8 +82,8 @@ public class BrowserInteractionService {
         return schedule;
     }
 
-    public ByteArrayInputStream getWeekShutdownScheduleScreenshot(UserSession userSession) {
-        String userCity = userSession.getUserCity();
+    public ByteArrayInputStream getWeekShutdownScheduleScreenshot(UserSession session) {
+        String userCity = session.getUserCity();
         acquireWebDriverWithAwaits(this, userCity);
         driver.manage().window().setSize(new Dimension(1024, 768));
         awaitForDtekPage();
@@ -91,12 +91,12 @@ public class BrowserInteractionService {
         byte[] screenshotBytes;
         try {
             if (isKyiv(userCity)) {
-                fillKyivInputs(userSession);
+                fillKyivInputs(session);
             } else {
-                fillRegionInputs(userSession);
+                fillRegionInputs(session);
             }
 
-            setShutdownGroupByJS(userSession);
+            setShutdownGroupByJS(session);
 
             screenshotBytes = getScreenshotOfElementLocated(XPATH_SCHEDULE_TABLE);
         } finally {
@@ -106,20 +106,20 @@ public class BrowserInteractionService {
         return new ByteArrayInputStream(screenshotBytes);
     }
 
-    public String getShutdownStatus(UserSession userSession) {
-        String userCity = userSession.getUserCity();
+    public String getShutdownStatus(UserSession session) {
+        String userCity = session.getUserCity();
         acquireWebDriverWithAwaits(this, userCity);
         awaitForDtekPage();
 
         String status;
         try {
             if (isKyiv(userCity)) {
-                fillKyivInputs(userSession);
+                fillKyivInputs(session);
             } else {
-                fillRegionInputs(userSession);
+                fillRegionInputs(session);
             }
 
-            setShutdownGroupByJS(userSession);
+            setShutdownGroupByJS(session);
 
             status = getShutdownStatus();
         } finally {
@@ -165,41 +165,41 @@ public class BrowserInteractionService {
         }
     }
 
-    private void fillKyivInputs(UserSession userSession) {
-        fillStreetInput(userSession);
-        fillHouseInput(userSession);
+    private void fillKyivInputs(UserSession session) {
+        fillStreetInput(session);
+        fillHouseInput(session);
     }
 
-    private void fillRegionInputs(UserSession userSession) {
+    private void fillRegionInputs(UserSession session) {
         try {
-            fillRegionInputsWithAwareOfCityOptions(userSession);
+            fillRegionInputsWithAwareOfCityOptions(session);
         } catch (InvalidAddressException e) {
-            log.warn("Chat id: {}. Failed to fill region inputs", userSession.getChatId());
+            log.warn("Chat id: {}. Failed to fill region inputs", session.getChatId());
 
-            if (userSession.getUserCity().contains("(")) {
-                String cityWithoutRegion = userSession.getUserCity().split(" ")[0];
+            if (session.getUserCity().contains("(")) {
+                String cityWithoutRegion = session.getUserCity().split(" ")[0];
                 log.info("Chat id: {}. User city contains region, trying to fill inputs without it",
-                    userSession.getChatId());
+                    session.getChatId());
 
-                userSession.setUserCity(cityWithoutRegion);
-                fillRegionInputsWithAwareOfCityOptions(userSession);
+                session.setUserCity(cityWithoutRegion);
+                fillRegionInputsWithAwareOfCityOptions(session);
             } else {
                 throw e;
             }
         }
     }
 
-    private void fillRegionInputsWithAwareOfCityOptions(UserSession userSession) {
-        int autocompleteOptionsCount = getRegionCityOptionsCount(userSession);
+    private void fillRegionInputsWithAwareOfCityOptions(UserSession session) {
+        int autocompleteOptionsCount = getRegionCityOptionsCount(session);
 
         for (int i = 1; i <= autocompleteOptionsCount; i++) {
             try {
-                fillRegionCityInput(userSession, i);
-                fillStreetInput(userSession);
-                fillHouseInput(userSession);
+                fillRegionCityInput(session, i);
+                fillStreetInput(session);
+                fillHouseInput(session);
                 break;
             } catch (InvalidAddressException e) {
-                log.warn("Chat id: {}. Failed to fill inputs for city option {}", userSession.getChatId(), i);
+                log.warn("Chat id: {}. Failed to fill inputs for city option {}", session.getChatId(), i);
                 if (i == autocompleteOptionsCount) {
                     throw e;
                 }
@@ -207,15 +207,15 @@ public class BrowserInteractionService {
         }
 
         String cityAutocomplete = driver.findElement(By.xpath(XPATH_CITY_INPUT)).getAttribute("value");
-        if (!userSession.getUserCity().equals(cityAutocomplete)) {
-            log.warn("Chat id: {}. User city {} does not match autocomplete city {}", userSession.getChatId(),
-                userSession.getUserCity(), cityAutocomplete);
-            userSession.setUserCity(cityAutocomplete);
+        if (!session.getUserCity().equals(cityAutocomplete)) {
+            log.warn("Chat id: {}. User city {} does not match autocomplete city {}", session.getChatId(),
+                session.getUserCity(), cityAutocomplete);
+            session.setUserCity(cityAutocomplete);
         }
     }
 
-    private int getRegionCityOptionsCount(UserSession userSession) {
-        String userCity = userSession.getUserCity();
+    private int getRegionCityOptionsCount(UserSession session) {
+        String userCity = session.getUserCity();
         WebElement input = driver.findElement(By.xpath(XPATH_CITY_INPUT));
         fillInput(input, userCity);
 
@@ -228,19 +228,19 @@ public class BrowserInteractionService {
         return count;
     }
 
-    private void fillRegionCityInput(UserSession userSession, int optionNumber) {
-        String userCity = userSession.getUserCity();
+    private void fillRegionCityInput(UserSession session, int optionNumber) {
+        String userCity = session.getUserCity();
         WebElement input = driver.findElement(By.xpath(XPATH_CITY_INPUT));
         fillInput(input, userCity);
 
         String autocompleteXpath = String.format(XPATH_CITY_AUTOCOMPLETE_FORMAT, optionNumber);
         String cityAutocomplete = getAutocompleteInput(input, autocompleteXpath, userCity);
 
-        log.info("Chat id: {}. User city: {}, autocomplete: {}", userSession.getChatId(), userCity, cityAutocomplete);
+        log.info("Chat id: {}. User city: {}, autocomplete: {}", session.getChatId(), userCity, cityAutocomplete);
     }
 
-    private void fillStreetInput(UserSession userSession) {
-        String userStreet = userSession.getUserStreet();
+    private void fillStreetInput(UserSession session) {
+        String userStreet = session.getUserStreet();
         WebElement input = pageAwait.until(elementToBeClickable(By.xpath(XPATH_STREET_INPUT)));
         fillInput(input, userStreet);
 
@@ -258,9 +258,9 @@ public class BrowserInteractionService {
         }
 
         if (!userStreet.equals(streetAutocomplete)) {
-            log.warn("Chat id: {}. User street {} does not match autocomplete street {}", userSession.getChatId(),
+            log.warn("Chat id: {}. User street {} does not match autocomplete street {}", session.getChatId(),
                 userStreet, streetAutocomplete);
-            userSession.setUserStreet(streetAutocomplete);
+            session.setUserStreet(streetAutocomplete);
         }
     }
 
@@ -277,8 +277,8 @@ public class BrowserInteractionService {
         return autocompleteValue;
     }
 
-    private void fillHouseInput(UserSession userSession) {
-        String userHouse = userSession.getUserHouse();
+    private void fillHouseInput(UserSession session) {
+        String userHouse = session.getUserHouse();
         WebElement input = pageAwait.until(elementToBeClickable(By.xpath(XPATH_HOUSE_INPUT)));
         fillInput(input, userHouse);
 
@@ -295,9 +295,9 @@ public class BrowserInteractionService {
         }
 
         if (!userHouse.equals(houseAutocomplete)) {
-            log.warn("Chat id: {}. User house {} does not match autocomplete house {}", userSession.getChatId(),
+            log.warn("Chat id: {}. User house {} does not match autocomplete house {}", session.getChatId(),
                 userHouse, houseAutocomplete);
-            userSession.setUserHouse(houseAutocomplete);
+            session.setUserHouse(houseAutocomplete);
         }
     }
 
@@ -329,9 +329,9 @@ public class BrowserInteractionService {
         return autocompleteValue;
     }
 
-    private void setShutdownGroupByJS(UserSession userSession) {
+    private void setShutdownGroupByJS(UserSession session) {
         String json = (String) ((JavascriptExecutor) driver).executeScript(JS_GET_GROUP);
-        userSession.setShutdownGroup(Byte.parseByte(json));
+        session.setShutdownGroup(Byte.parseByte(json));
     }
 
     private String getScheduleByJS() {

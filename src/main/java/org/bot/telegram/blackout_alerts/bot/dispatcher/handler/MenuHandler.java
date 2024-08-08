@@ -1,7 +1,6 @@
 package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 
 import lombok.extern.slf4j.Slf4j;
-import org.bot.telegram.blackout_alerts.model.session.SessionState;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.bot.telegram.blackout_alerts.service.TelegramService;
 import org.bot.telegram.blackout_alerts.service.UserSessionService;
@@ -20,19 +19,17 @@ public class MenuHandler extends AbstractHandler {
     }
 
     @Override
-    public boolean isHandleable(UserSession userSession) {
-        return MENU.equals(userSession.getText());
+    public boolean isHandleable(UserSession session) {
+        return MENU.equals(session.getText());
     }
 
     @Override
-    public void handle(UserSession userSession) {
-        log.info("Chat id: {}. MenuHandler.handle()", userSession.getChatId());
-        log.info("Chat id: {}. Session state: {}. Text: {}", userSession.getChatId(), userSession.getSessionState(),
-            userSession.getText());
+    public void handle(UserSession session) {
+        logStartHandle(session);
 
         KeyboardBuilder keyboardBuilder = KeyboardBuilder.builder();
 
-        if (SessionState.ADDRESS_ACQUIRED_STATES.contains(userSession.getSessionState())) {
+        if (isAddressAcquired(session)) {
             keyboardBuilder.addShowAddressButton()
                 .addChangeAddressButton()
                 .addShowScheduleButton()
@@ -43,7 +40,7 @@ public class MenuHandler extends AbstractHandler {
         }
 
         SendMessage message = SendMessage.builder()
-            .chatId(userSession.getChatId())
+            .chatId(session.getChatId())
             .text("⬇ Оберіть варіант з наведених нижче ⬇")
             .replyMarkup(keyboardBuilder.build())
             .build();

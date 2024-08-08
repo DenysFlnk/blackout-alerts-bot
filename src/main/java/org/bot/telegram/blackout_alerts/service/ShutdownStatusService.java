@@ -15,10 +15,10 @@ public class ShutdownStatusService {
 
     private final AddressService addressService;
 
-    public String getShutdownStatus(UserSession userSession) {
-        String status = browserService.getShutdownStatus(userSession);
-        addressService.updateAddressInDb(userSession);
-        log.info("Chat id: {}. Success getting shutdown status", userSession.getChatId());
+    public String getShutdownStatus(UserSession session) {
+        String status = browserService.getShutdownStatus(session);
+        addressService.updateAddressInDb(session);
+        log.info("Chat id: {}. Success getting shutdown status", session.getChatId());
         return status;
     }
 }

@@ -1,7 +1,6 @@
 package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 
 import lombok.extern.slf4j.Slf4j;
-import org.bot.telegram.blackout_alerts.model.session.SessionState;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.bot.telegram.blackout_alerts.service.TelegramService;
 import org.bot.telegram.blackout_alerts.service.UserSessionService;
@@ -23,23 +22,21 @@ public class ShowAddressHandler extends AbstractHandler {
     }
 
     @Override
-    public boolean isHandleable(UserSession userSession) {
-        return SHOW_ADDRESS.equals(userSession.getText());
+    public boolean isHandleable(UserSession session) {
+        return SHOW_ADDRESS.equals(session.getText());
     }
 
     @Override
-    public void handle(UserSession userSession) {
-        log.info("Chat id: {}. ShowAddressHandler.handle()", userSession.getChatId());
-        log.info("Chat id: {}. Session state: {}. Text: {}", userSession.getChatId(), userSession.getSessionState(),
-            userSession.getText());
+    public void handle(UserSession session) {
+        logStartHandle(session);
 
-        String message = getAddressMessage(userSession);
+        String message = getAddressMessage(session);
 
         SendMessageBuilder messageBuilder = SendMessage.builder()
-            .chatId(userSession.getChatId())
+            .chatId(session.getChatId())
             .text(message);
 
-        if (SessionState.ADDRESS_ACQUIRED_STATES.contains(userSession.getSessionState())) {
+        if (isAddressAcquired(session)) {
             InlineKeyboardMarkup keyboard = KeyboardBuilder.builder()
                 .addCheckShutdownStatusButton()
                 .addShowScheduleButton()
@@ -53,12 +50,12 @@ public class ShowAddressHandler extends AbstractHandler {
         telegramService.sendMessage(messageBuilder.build());
     }
 
-    private static String getAddressMessage(UserSession userSession) {
+    private static String getAddressMessage(UserSession session) {
         String noEntry = "Не вказано \uD83D\uDEAB";
 
-        String city = userSession.getUserCity() != null ? userSession.getUserCity() : noEntry;
-        String street = userSession.getUserStreet() != null ? userSession.getUserStreet() : noEntry;
-        String house = userSession.getUserHouse() != null ? userSession.getUserHouse() : noEntry;
+        String city = session.getUserCity() != null ? session.getUserCity() : noEntry;
+        String street = session.getUserStreet() != null ? session.getUserStreet() : noEntry;
+        String house = session.getUserHouse() != null ? session.getUserHouse() : noEntry;
 
         return String.format("""
             🏘 Населенний пункт ➡ %s

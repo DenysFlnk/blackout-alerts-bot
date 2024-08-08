@@ -27,42 +27,39 @@ public class CheckShutdownStatusHandler extends AbstractHandler {
     }
 
     @Override
-    public boolean isHandleable(UserSession userSession) {
-        return CHECK_SHUTDOWN_STATUS.equals(userSession.getText());
+    public boolean isHandleable(UserSession session) {
+        return CHECK_SHUTDOWN_STATUS.equals(session.getText());
     }
 
     @Override
-    public void handle(UserSession userSession) {
-        log.info("Chat id: {}. CheckStatusHandler.handle()", userSession.getChatId());
-        log.info("Chat id: {}. Session state: {}. Text: {}", userSession.getChatId(), userSession.getSessionState(),
-            userSession.getText());
+    public void handle(UserSession session) {
+        logStartHandle(session);
 
-        if (!SessionState.ADDRESS_ACQUIRED_STATES.contains(userSession.getSessionState())) {
-            log.warn("Chat id: {}. Address not acquired", userSession.getChatId());
-            sendAddressNotAcquiredMessage(userSession);
+        if (!isAddressAcquired(session)) {
+            sendAddressNotAcquiredMessage(session);
             return;
         }
 
-        userSession.setSessionState(SessionState.CHECK_SHUTDOWN_STATUS);
-        sendStatusLoadingMessage(userSession);
+        session.setSessionState(SessionState.CHECK_SHUTDOWN_STATUS);
+        sendStatusLoadingMessage(session);
 
         String status;
         try {
-            status = shutdownStatusService.getShutdownStatus(userSession);
+            status = shutdownStatusService.getShutdownStatus(session);
         } catch (ShutdownStatusUnavailableException e) {
             SendMessage message = SendMessage.builder()
-                .chatId(userSession.getChatId())
+                .chatId(session.getChatId())
                 .text(e.getMessage())
                 .build();
             telegramService.sendMessage(message);
             return;
         } catch (InvalidAddressException e) {
-            log.error("Chat id: {}. Invalid address for field {}, value {}", userSession.getChatId(),
+            log.error("Chat id: {}. Invalid address for field {}, value {}", session.getChatId(),
                 e.getAddressField(), e.getFieldValue());
-            sendInvalidAddressMessage(userSession, e);
+            sendInvalidAddressMessage(session, e);
             return;
         } finally {
-            userSessionService.saveUserSession(userSession);
+            userSessionService.saveUserSession(session);
         }
 
         String textMessage = String.format("""
@@ -71,10 +68,10 @@ public class CheckShutdownStatusHandler extends AbstractHandler {
             ➖➖➖➖➖➖➖➖➖➖➖➖
             %s
             ➖➖➖➖➖➖➖➖➖➖➖➖
-            """, userSession.getUserCity(), userSession.getUserStreet(), userSession.getUserHouse(), status);
+            """, session.getUserCity(), session.getUserStreet(), session.getUserHouse(), status);
 
         SendMessage message = SendMessage.builder()
-            .chatId(userSession.getChatId())
+            .chatId(session.getChatId())
             .text(textMessage)
             .replyMarkup(KeyboardBuilder.builder().addReturnToMenuButton().build())
             .build();
@@ -82,9 +79,9 @@ public class CheckShutdownStatusHandler extends AbstractHandler {
         telegramService.sendMessage(message);
     }
 
-    private void sendStatusLoadingMessage(UserSession userSession) {
+    private void sendStatusLoadingMessage(UserSession session) {
         SendMessage message = SendMessage.builder()
-            .chatId(userSession.getChatId())
+            .chatId(session.getChatId())
             .text("""
                 Перевіряємо статус відключення за вашою адресою 📶
                 

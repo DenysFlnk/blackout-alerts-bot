@@ -26,22 +26,20 @@ public class StartHandler extends AbstractHandler {
     }
 
     @Override
-    public void handle(UserSession userSession) {
-        log.info("Chat id: {}. StartHandler.handle()", userSession.getChatId());
-        log.info("Chat id: {}. Session state: {}. Text: {}", userSession.getChatId(), userSession.getSessionState(),
-            userSession.getText());
+    public void handle(UserSession session) {
+        logStartHandle(session);
 
         SendMessage sendMessage;
-        if (SessionState.START.equals(userSession.getSessionState())) {
-            sendMessage = getWelcomeMessage(userSession);
+        if (SessionState.START.equals(session.getSessionState())) {
+            sendMessage = getWelcomeMessage(session);
         } else {
-            sendMessage = getWelcomeBackMessage(userSession);
+            sendMessage = getWelcomeBackMessage(session);
         }
 
         telegramService.sendMessage(sendMessage);
     }
 
-    private static SendMessage getWelcomeBackMessage(UserSession userSession) {
+    private static SendMessage getWelcomeBackMessage(UserSession session) {
         InlineKeyboardMarkup keyboard = KeyboardBuilder.builder()
             .addShowAddressButton()
             .addChangeAddressButton()
@@ -54,12 +52,12 @@ public class StartHandler extends AbstractHandler {
                 
                 Оберіть варіант з наведених нижче ⬇
                 """)
-            .chatId(userSession.getChatId())
+            .chatId(session.getChatId())
             .replyMarkup(keyboard)
             .build();
     }
 
-    private static SendMessage getWelcomeMessage(UserSession userSession) {
+    private static SendMessage getWelcomeMessage(UserSession session) {
         InlineKeyboardMarkup keyboard = KeyboardBuilder.builder()
             .addEnterAddressButton()
             .build();
@@ -72,7 +70,7 @@ public class StartHandler extends AbstractHandler {
                 
                 Для того, щоб почати, натисніть кнопку "Ввести адресу 🏘"
                 """)
-            .chatId(userSession.getChatId())
+            .chatId(session.getChatId())
             .replyMarkup(keyboard)
             .build();
     }

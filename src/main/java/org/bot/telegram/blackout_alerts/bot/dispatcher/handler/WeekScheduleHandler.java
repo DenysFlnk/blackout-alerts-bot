@@ -30,44 +30,41 @@ public class WeekScheduleHandler extends AbstractHandler {
     }
 
     @Override
-    public boolean isHandleable(UserSession userSession) {
-        return WEEK_SCHEDULE.equals(userSession.getText());
+    public boolean isHandleable(UserSession session) {
+        return WEEK_SCHEDULE.equals(session.getText());
     }
 
     @Override
-    public void handle(UserSession userSession) {
-        log.info("Chat id: {}. WeekScheduleHandler.handle()", userSession.getChatId());
-        log.info("Chat id: {}. Session state: {}. Text: {}", userSession.getChatId(), userSession.getSessionState(),
-            userSession.getText());
+    public void handle(UserSession session) {
+        logStartHandle(session);
 
-        if (!SessionState.ADDRESS_ACQUIRED_STATES.contains(userSession.getSessionState())) {
-            log.warn("Chat id: {}. Address not acquired", userSession.getChatId());
-            sendAddressNotAcquiredMessage(userSession);
+        if (!isAddressAcquired(session)) {
+            sendAddressNotAcquiredMessage(session);
             return;
         }
 
-        userSession.setSessionState(SessionState.WEEK_SCHEDULE);
-        sendScheduleLoadingMessage(userSession);
+        session.setSessionState(SessionState.WEEK_SCHEDULE);
+        sendScheduleLoadingMessage(session);
 
         ByteArrayInputStream screenshot;
         try {
-            screenshot = scheduleService.getWeekScheduleScreenshot(userSession);
+            screenshot = scheduleService.getWeekScheduleScreenshot(session);
         } catch (InvalidAddressException e) {
-            log.error("Chat id: {}. Invalid address for field {}, value {}", userSession.getChatId(),
+            log.error("Chat id: {}. Invalid address for field {}, value {}", session.getChatId(),
                 e.getAddressField(), e.getFieldValue());
-            sendInvalidAddressMessage(userSession, e);
+            sendInvalidAddressMessage(session, e);
             return;
         } finally {
-            userSessionService.saveUserSession(userSession);
+            userSessionService.saveUserSession(session);
         }
 
-        String fileName = String.format("%s_withAddress_%s_%s_%s_date_%s", userSession.getChatId(),
-            userSession.getUserCity(), userSession.getUserStreet(), userSession.getUserHouse(), LocalDateTime.now());
+        String fileName = String.format("%s_withAddress_%s_%s_%s_date_%s", session.getChatId(),
+            session.getUserCity(), session.getUserStreet(), session.getUserHouse(), LocalDateTime.now());
         InputFile file = new InputFile(screenshot, fileName);
 
         SendPhoto photo = SendPhoto.builder()
-            .chatId(userSession.getChatId())
-            .caption(getCaption(userSession))
+            .chatId(session.getChatId())
+            .caption(getCaption(session))
             .photo(file)
             .replyMarkup(KeyboardBuilder.builder().addReturnToMenuButton().build())
             .build();
@@ -75,14 +72,14 @@ public class WeekScheduleHandler extends AbstractHandler {
         telegramService.sendPhoto(photo);
     }
 
-    public static String getCaption(UserSession userSession) {
+    public static String getCaption(UserSession session) {
         return String.format("""
             Графік відключень на тиждень за адресою:
             %s, %s, %s
             
             🚩 Зверніть увагу, що графік актуальний на %s.
             Не забувайте час від часу надсилати запит на тижневий графік повторно, щоб бути впевненим в його актуальності ✅
-            """, userSession.getUserCity(), userSession.getUserStreet(), userSession.getUserHouse(),
+            """, session.getUserCity(), session.getUserStreet(), session.getUserHouse(),
             LocalDate.now());
     }
 }

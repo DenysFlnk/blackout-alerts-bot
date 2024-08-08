@@ -38,8 +38,8 @@ public class UserSessionService {
         return session;
     }
 
-    public void saveUserSession(UserSession userSession) {
-        userInfoRepository.save(UserSessionUtil.getUserInfo(userSession));
+    public void saveUserSession(UserSession session) {
+        userInfoRepository.save(UserSessionUtil.getUserInfo(session));
     }
 
     private Optional<UserSession> getFromDb(long chatId) {

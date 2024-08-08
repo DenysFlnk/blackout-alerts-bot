@@ -28,8 +28,8 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         if (hasMessageText(update) || update.hasCallbackQuery()) {
-            UserSession userSession = userSessionService.getOrCreateUserSession(update);
-            dispatcher.dispatch(userSession);
+            UserSession session = userSessionService.getOrCreateUserSession(update);
+            dispatcher.dispatch(session);
         }
     }
 

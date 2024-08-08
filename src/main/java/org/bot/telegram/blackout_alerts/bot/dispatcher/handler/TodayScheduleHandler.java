@@ -26,39 +26,36 @@ public class TodayScheduleHandler extends AbstractHandler {
     }
 
     @Override
-    public boolean isHandleable(UserSession userSession) {
-        return TODAY_SCHEDULE.equals(userSession.getText());
+    public boolean isHandleable(UserSession session) {
+        return TODAY_SCHEDULE.equals(session.getText());
     }
 
     @Override
-    public void handle(UserSession userSession) {
-        log.info("Chat id: {}. TodayScheduleHandler.handle()", userSession.getChatId());
-        log.info("Chat id: {}. Session state: {}. Text: {}", userSession.getChatId(), userSession.getSessionState(),
-            userSession.getText());
+    public void handle(UserSession session) {
+        logStartHandle(session);
 
-        if (!SessionState.ADDRESS_ACQUIRED_STATES.contains(userSession.getSessionState())) {
-            log.warn("Chat id: {}. Address not acquired", userSession.getChatId());
-            sendAddressNotAcquiredMessage(userSession);
+        if (!isAddressAcquired(session)) {
+            sendAddressNotAcquiredMessage(session);
             return;
         }
 
-        userSession.setSessionState(SessionState.TODAY_SCHEDULE);
-        sendScheduleLoadingMessage(userSession);
+        session.setSessionState(SessionState.TODAY_SCHEDULE);
+        sendScheduleLoadingMessage(session);
 
         String schedule;
         try {
-            schedule = scheduleService.getRenderedTodaySchedule(userSession);
+            schedule = scheduleService.getRenderedTodaySchedule(session);
         } catch (InvalidAddressException e) {
-            log.error("Chat id: {}. Invalid address for field {}, value {}", userSession.getChatId(),
+            log.error("Chat id: {}. Invalid address for field {}, value {}", session.getChatId(),
                 e.getAddressField(), e.getFieldValue());
-            sendInvalidAddressMessage(userSession, e);
+            sendInvalidAddressMessage(session, e);
             return;
         } finally {
-            userSessionService.saveUserSession(userSession);
+            userSessionService.saveUserSession(session);
         }
 
         SendMessage sendMessage = SendMessage.builder()
-            .chatId(userSession.getChatId())
+            .chatId(session.getChatId())
             .parseMode("HTML")
             .replyMarkup(KeyboardBuilder.builder().addReturnToMenuButton().build())
             .text(schedule)

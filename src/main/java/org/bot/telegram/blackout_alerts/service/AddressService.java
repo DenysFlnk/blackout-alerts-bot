@@ -20,16 +20,16 @@ public class AddressService {
 
     private final AddressEntityRepository addressRepository;
 
-    public Optional<Address> getAddressFromDb(UserSession userSession) {
+    public Optional<Address> getAddressFromDb(UserSession session) {
         List<AddressEntity> addresses = addressRepository.findAllByCityContainsAndStreetContainsAndHouse(
-            userSession.getUserCity(), userSession.getUserStreet(), userSession.getUserHouse());
+            session.getUserCity(), session.getUserStreet(), session.getUserHouse());
 
         if (addresses.isEmpty()) {
             return Optional.empty();
         }
 
         if (addresses.size() > 1) {
-            log.info("Chat id: {}. Found more then one address in DB. Getting latest", userSession.getChatId());
+            log.info("Chat id: {}. Found more then one address in DB. Getting latest", session.getChatId());
             List<AddressEntity> sortedAddresses = addresses.stream()
                 .sorted(Comparator.comparingInt(AddressEntity::getId))
                 .collect(Collectors.toList());
@@ -45,8 +45,8 @@ public class AddressService {
         }
     }
 
-    public void updateAddressInDb(UserSession userSession) {
-        AddressEntity address = UserSessionUtil.getAddressEntity(userSession);
+    public void updateAddressInDb(UserSession session) {
+        AddressEntity address = UserSessionUtil.getAddressEntity(session);
         addressRepository.findByCityAndStreetAndHouse(address.getCity(), address.getStreet(), address.getHouse())
             .ifPresent(addressEntity -> address.setId(addressEntity.getId()));
         addressRepository.save(address);

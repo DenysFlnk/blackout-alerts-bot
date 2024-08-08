@@ -32,27 +32,27 @@ public class ScheduleService {
 
     private final ZoneScheduleRepository scheduleRepository;
 
-    public ByteArrayInputStream getWeekScheduleScreenshot(UserSession userSession) {
-        ByteArrayInputStream screenshot = browserService.getWeekShutdownScheduleScreenshot(userSession);
-        addressService.updateAddressInDb(userSession);
-        log.info("Chat id: {}. Success getting week shutdown schedule screenshot", userSession.getChatId());
+    public ByteArrayInputStream getWeekScheduleScreenshot(UserSession session) {
+        ByteArrayInputStream screenshot = browserService.getWeekShutdownScheduleScreenshot(session);
+        addressService.updateAddressInDb(session);
+        log.info("Chat id: {}. Success getting week shutdown schedule screenshot", session.getChatId());
         return screenshot;
     }
 
-    public String getRenderedTodaySchedule(UserSession userSession) {
-        Schedule schedule = getShutdownScheduleFromDb(userSession)
-            .orElseGet(() -> getShutdownScheduleFromWeb(userSession));
+    public String getRenderedTodaySchedule(UserSession session) {
+        Schedule schedule = getShutdownScheduleFromDb(session)
+            .orElseGet(() -> getShutdownScheduleFromWeb(session));
         return renderTodaySchedule(schedule);
     }
 
-    private Optional<Schedule> getShutdownScheduleFromDb(UserSession userSession) {
-        log.info("Chat id: {}. Trying to get shutdown schedule from DB", userSession.getChatId());
-        Optional<Address> addressOptional = addressService.getAddressFromDb(userSession);
+    private Optional<Schedule> getShutdownScheduleFromDb(UserSession session) {
+        log.info("Chat id: {}. Trying to get shutdown schedule from DB", session.getChatId());
+        Optional<Address> addressOptional = addressService.getAddressFromDb(session);
 
         if (addressOptional.isPresent()) {
-            log.info("Chat id: {}. Address is present in DB", userSession.getChatId());
+            log.info("Chat id: {}. Address is present in DB", session.getChatId());
             Address address = addressOptional.get();
-            userSession.setAddress(address);
+            session.setAddress(address);
 
             Optional<ZoneSchedule> zoneSchedule = scheduleRepository.findByZoneAndExpireDateAfter(
                 Zone.findZone(address.getCity()), LocalDateTime.now());
@@ -60,28 +60,28 @@ public class ScheduleService {
             return zoneSchedule.map(schedule -> parseSchedule(schedule.getScheduleJson(), address.getShutdownGroup()));
         }
 
-        log.info("Chat id: {}. Address {}, {}, {} in DB not found", userSession.getChatId(), userSession.getUserCity(),
-            userSession.getUserStreet(), userSession.getUserHouse());
+        log.info("Chat id: {}. Address {}, {}, {} in DB not found", session.getChatId(), session.getUserCity(),
+            session.getUserStreet(), session.getUserHouse());
         return Optional.empty();
     }
 
-    private Schedule getShutdownScheduleFromWeb(UserSession userSession) {
-        log.info("Chat id: {}. Getting shutdown schedule from web", userSession.getChatId());
+    private Schedule getShutdownScheduleFromWeb(UserSession session) {
+        log.info("Chat id: {}. Getting shutdown schedule from web", session.getChatId());
         try {
-            String scheduleJson = browserService.getShutDownSchedule(userSession);
+            String scheduleJson = browserService.getShutDownSchedule(session);
 
-            addressService.updateAddressInDb(userSession);
-            scheduleRepository.save(ScheduleUtil.getZoneSchedule(userSession, scheduleJson));
+            addressService.updateAddressInDb(session);
+            scheduleRepository.save(ScheduleUtil.getZoneSchedule(session, scheduleJson));
 
-            log.info("Chat id: {}. Success getting shutdown schedule from web", userSession.getChatId());
-            return parseSchedule(scheduleJson, userSession.getShutdownGroup());
+            log.info("Chat id: {}. Success getting shutdown schedule from web", session.getChatId());
+            return parseSchedule(scheduleJson, session.getShutdownGroup());
         } catch (WebDriverException | InvalidAddressException e) {
             log.warn("Chat id: {}. Got an '{}' while getting shutdown schedule from web. "
-                + "Trying to find address in DB", userSession.getChatId(), e.getClass().getSimpleName());
-            Optional<Address> addressOptional = addressService.getAddressFromDb(userSession);
+                + "Trying to find address in DB", session.getChatId(), e.getClass().getSimpleName());
+            Optional<Address> addressOptional = addressService.getAddressFromDb(session);
 
             if (addressOptional.isPresent()) {
-                log.info("Chat id: {}. Found address in DB {}", userSession.getChatId(), addressOptional.get());
+                log.info("Chat id: {}. Found address in DB {}", session.getChatId(), addressOptional.get());
                 Address address = addressOptional.get();
                 Zone zone = Zone.findZone(address.getCity());
                 ZoneSchedule zoneSchedule = scheduleRepository.findById(zone).orElseThrow(

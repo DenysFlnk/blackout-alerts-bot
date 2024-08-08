@@ -34,9 +34,7 @@ public class EnterAddressHandler extends AbstractHandler {
 
     @Override
     public void handle(UserSession userSession) {
-        log.info("Chat id: {}. EnterAddressHandler.handle()", userSession.getChatId());
-        log.info("Chat id: {}. Session state: {}. Text: {}", userSession.getChatId(), userSession.getSessionState(),
-            userSession.getText());
+        logStartHandle(userSession);
 
         if (ENTER_ADDRESS.equals(userSession.getText())) {
             telegramService.sendMessage(getEnterCityMessage(userSession));
