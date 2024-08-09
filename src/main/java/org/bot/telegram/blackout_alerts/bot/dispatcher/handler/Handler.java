@@ -4,7 +4,7 @@ import org.bot.telegram.blackout_alerts.model.session.UserSession;
 
 public interface Handler {
 
-    boolean isHandleable(UserSession userSession);
+    boolean isHandleable(UserSession session);
 
-    void handle(UserSession userSession);
+    void handle(UserSession session);
 }

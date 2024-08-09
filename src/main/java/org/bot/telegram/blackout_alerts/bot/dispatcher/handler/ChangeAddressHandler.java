@@ -20,18 +20,18 @@ public class ChangeAddressHandler extends AbstractHandler {
     }
 
     @Override
-    public boolean isHandleable(UserSession userSession) {
-        return CHANGE_ADDRESS.equals(userSession.getText());
+    public boolean isHandleable(UserSession session) {
+        return CHANGE_ADDRESS.equals(session.getText());
     }
 
     @Override
-    public void handle(UserSession userSession) {
-        logStartHandle(userSession);
+    public void handle(UserSession session) {
+        logStartHandle(session);
 
-        userSession.setAddress(new Address());
-        userSession.setSessionState(SessionState.WAIT_FOR_CITY);
+        session.setAddress(new Address());
+        session.setSessionState(SessionState.WAIT_FOR_CITY);
 
-        telegramService.sendMessage(EnterAddressHandler.getEnterCityMessage(userSession));
-        userSessionService.saveUserSession(userSession);
+        telegramService.sendMessage(EnterAddressHandler.getEnterCityMessage(session));
+        userSessionService.saveUserSession(session);
     }
 }

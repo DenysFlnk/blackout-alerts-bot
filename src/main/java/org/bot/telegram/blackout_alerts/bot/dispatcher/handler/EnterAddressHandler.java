@@ -27,56 +27,56 @@ public class EnterAddressHandler extends AbstractHandler {
     }
 
     @Override
-    public boolean isHandleable(UserSession userSession) {
-        return ENTER_ADDRESS.equals(userSession.getText()) ||
-               SessionState.WAIT_FOR_INPUTS.contains(userSession.getSessionState());
+    public boolean isHandleable(UserSession session) {
+        return ENTER_ADDRESS.equals(session.getText()) ||
+               SessionState.WAIT_FOR_INPUTS.contains(session.getSessionState());
     }
 
     @Override
-    public void handle(UserSession userSession) {
-        logStartHandle(userSession);
+    public void handle(UserSession session) {
+        logStartHandle(session);
 
-        if (ENTER_ADDRESS.equals(userSession.getText())) {
-            telegramService.sendMessage(getEnterCityMessage(userSession));
+        if (ENTER_ADDRESS.equals(session.getText())) {
+            telegramService.sendMessage(getEnterCityMessage(session));
 
-            userSession.setSessionState(SessionState.WAIT_FOR_CITY);
-            userSessionService.saveUserSession(userSession);
+            session.setSessionState(SessionState.WAIT_FOR_CITY);
+            userSessionService.saveUserSession(session);
             return;
         }
 
         SendMessage message;
-        switch (userSession.getSessionState()) {
+        switch (session.getSessionState()) {
             case WAIT_FOR_CITY -> {
-                log.info("Chat id: {}. Entered city: {}", userSession.getChatId(), userSession.getText());
-                String city = userSession.getText();
+                log.info("Chat id: {}. Entered city: {}", session.getChatId(), session.getText());
+                String city = session.getText();
                 validateCityInput(city);
-                userSession.setUserCity(city);
-                message = isKyiv(city) ? getEnterKyivStreetMessage(userSession) : getEnterRegionStreetMessage(userSession);
-                userSession.setSessionState(SessionState.WAIT_FOR_STREET);
+                session.setUserCity(city);
+                message = isKyiv(city) ? getEnterKyivStreetMessage(session) : getEnterRegionStreetMessage(session);
+                session.setSessionState(SessionState.WAIT_FOR_STREET);
             }
             case WAIT_FOR_STREET -> {
-                log.info("Chat id: {}. Entered street: {}", userSession.getChatId(), userSession.getText());
-                String text = userSession.getText();
+                log.info("Chat id: {}. Entered street: {}", session.getChatId(), session.getText());
+                String text = session.getText();
                 validateStreetInput(text);
-                String street = isKyiv(userSession.getUserCity()) ? parseKyivStreetPrefix(text) : text;
-                userSession.setUserStreet(street);
-                message = getEnterHouseMessage(userSession);
-                userSession.setSessionState(SessionState.WAIT_FOR_HOUSE_NUMBER);
+                String street = isKyiv(session.getUserCity()) ? parseKyivStreetPrefix(text) : text;
+                session.setUserStreet(street);
+                message = getEnterHouseMessage(session);
+                session.setSessionState(SessionState.WAIT_FOR_HOUSE_NUMBER);
             }
             case WAIT_FOR_HOUSE_NUMBER -> {
-                log.info("Chat id: {}. Entered house: {}", userSession.getChatId(), userSession.getText());
-                String house = parseHouseNumber(userSession.getText());
-                userSession.setUserHouse(house);
-                message = getAddressAcquiredMessage(userSession);
-                userSession.setSessionState(SessionState.ADDRESS_ACQUIRED);
-                log.info("Chat id: {}. Address acquired: {}, {}, {}", userSession.getChatId(), userSession.getUserCity(),
-                    userSession.getUserStreet(), userSession.getUserHouse());
+                log.info("Chat id: {}. Entered house: {}", session.getChatId(), session.getText());
+                String house = parseHouseNumber(session.getText());
+                session.setUserHouse(house);
+                message = getAddressAcquiredMessage(session);
+                session.setSessionState(SessionState.ADDRESS_ACQUIRED);
+                log.info("Chat id: {}. Address acquired: {}, {}, {}", session.getChatId(), session.getUserCity(),
+                    session.getUserStreet(), session.getUserHouse());
             }
-            default -> throw new IllegalStateException("Unexpected session state: " + userSession.getSessionState());
+            default -> throw new IllegalStateException("Unexpected session state: " + session.getSessionState());
         }
 
         telegramService.sendMessage(message);
-        userSessionService.saveUserSession(userSession);
+        userSessionService.saveUserSession(session);
     }
 
     protected static SendMessage getEnterCityMessage(UserSession userSession) {

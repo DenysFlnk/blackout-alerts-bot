@@ -21,8 +21,8 @@ public class StartHandler extends AbstractHandler {
     }
 
     @Override
-    public boolean isHandleable(UserSession userSession) {
-        return START.equals(userSession.getText());
+    public boolean isHandleable(UserSession session) {
+        return START.equals(session.getText());
     }
 
     @Override
