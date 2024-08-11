@@ -16,6 +16,7 @@ public class KeyboardBuilder {
     private static final InlineKeyboardButton showWeekScheduleButton = showWeekScheduleButton();
     private static final InlineKeyboardButton checkShutdownStatusButton = checkShutdownStatusButton();
     private static final InlineKeyboardButton returnToMenuButton = returnToMenuButton();
+    private static final InlineKeyboardButton answerToUserButton = answerToUserButton();
 
     private final List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
@@ -78,6 +79,11 @@ public class KeyboardBuilder {
         return this;
     }
 
+    public KeyboardBuilder addAnswerToUserButton() {
+        keyboard.add(Collections.singletonList(answerToUserButton));
+        return this;
+    }
+
     public InlineKeyboardMarkup build() {
         return InlineKeyboardMarkup.builder()
             .keyboard(keyboard)
@@ -130,6 +136,13 @@ public class KeyboardBuilder {
         InlineKeyboardButton button = new InlineKeyboardButton();
         button.setText("Повернутись до меню \uD83D\uDCF2");
         button.setCallbackData("/menu");
+        return button;
+    }
+
+    private static InlineKeyboardButton answerToUserButton() {
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText("Відповісти на питання ❔");
+        button.setCallbackData("/answer_to_user");
         return button;
     }
 }
