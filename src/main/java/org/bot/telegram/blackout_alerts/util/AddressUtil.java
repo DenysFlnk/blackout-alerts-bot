@@ -7,12 +7,14 @@ import java.util.Set;
 
 public class AddressUtil {
 
-    public static final String KYIV = "Київ";
+    private static final String KYIV = "Київ";
 
     private static final Map<String, String> streetPrefixMap = new HashMap<>();
 
+    private static final String STR = "вул.";
+
     static {
-        streetPrefixMap.put("вулиця", "вул.");
+        streetPrefixMap.put("вулиця", STR);
         streetPrefixMap.put("площа", "пл.");
         streetPrefixMap.put("проспект", "просп.");
         streetPrefixMap.put("бульвар", "бульв.");
@@ -39,7 +41,7 @@ public class AddressUtil {
             return street;
         }
 
-        String prefix = streetPrefixMap.getOrDefault(split[0].toLowerCase(), "вул.");
+        String prefix = streetPrefixMap.getOrDefault(split[0].toLowerCase(), STR);
 
         StringBuilder result = new StringBuilder(prefix);
         int idx = split.length > 1 ? 1 : 0;

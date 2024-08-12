@@ -30,6 +30,14 @@ public class ScheduleUtil {
 
     private static final Map<Possibility, String> possibilityToEmojiMap = new EnumMap<>(Possibility.class);
 
+    private static final String TABLE_LEGEND_FORMAT = """
+        <pre>          %s
+        %s
+        \uD83D\uDFE2 - світло є
+        \uD83D\uDD34 - світло відсутнє
+        \uD83D\uDFE1 - можливе відключення
+        </pre>""";
+
     static {
         possibilityToEmojiMap.put(Possibility.YES, "\uD83D\uDFE2");
         possibilityToEmojiMap.put(Possibility.NO, "\uD83D\uDD34");
@@ -58,13 +66,7 @@ public class ScheduleUtil {
         board.setInitialBlock(table.tableToBlocks());
         board.build();
 
-        return String.format("""
-            <pre>          %s
-            %s
-            \uD83D\uDFE2 - світло є
-            \uD83D\uDD34 - світло відсутнє
-            \uD83D\uDFE1 - можливе відключення
-            </pre>""", LocalDate.now(), board.getPreview());
+        return String.format(TABLE_LEGEND_FORMAT, LocalDate.now(), board.getPreview());
     }
 
     public static ZoneSchedule getZoneSchedule(UserSession session, String scheduleJson) {

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class ChangeAddressHandler extends AbstractHandler {
 
-    private static final String CHANGE_ADDRESS = "/change_address";
+    private static final String CHANGE_ADDRESS_COMMAND = "/change_address";
 
     public ChangeAddressHandler(TelegramService telegramService,
                                 UserSessionService userSessionService) {
@@ -21,7 +21,7 @@ public class ChangeAddressHandler extends AbstractHandler {
 
     @Override
     public boolean isHandleable(UserSession session) {
-        return CHANGE_ADDRESS.equals(session.getText());
+        return CHANGE_ADDRESS_COMMAND.equals(session.getText());
     }
 
     @Override

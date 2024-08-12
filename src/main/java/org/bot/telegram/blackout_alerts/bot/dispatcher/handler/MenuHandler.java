@@ -12,7 +12,9 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 @Slf4j
 public class MenuHandler extends AbstractHandler {
 
-    private static final String MENU = "/menu";
+    private static final String MENU_COMMAND = "/menu";
+
+    private static final String CHOOSE_OPTION_MESSAGE = "⬇ Оберіть варіант з наведених нижче ⬇";
 
     public MenuHandler(TelegramService telegramService, UserSessionService userSessionService) {
         super(telegramService, userSessionService);
@@ -20,7 +22,7 @@ public class MenuHandler extends AbstractHandler {
 
     @Override
     public boolean isHandleable(UserSession session) {
-        return MENU.equals(session.getText());
+        return MENU_COMMAND.equals(session.getText());
     }
 
     @Override
@@ -41,7 +43,7 @@ public class MenuHandler extends AbstractHandler {
 
         SendMessage message = SendMessage.builder()
             .chatId(session.getChatId())
-            .text("⬇ Оберіть варіант з наведених нижче ⬇")
+            .text(CHOOSE_OPTION_MESSAGE)
             .replyMarkup(keyboardBuilder.build())
             .build();
 

@@ -14,7 +14,20 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 @Slf4j
 public class StartHandler extends AbstractHandler {
 
-    private static final String START = "/start";
+    private static final String START_COMMAND = "/start";
+
+    private static final String WELCOME_BACK_MESSAGE = """
+        Привіт! З поверненням! 🇺🇦
+        
+        Оберіть варіант з наведених нижче ⬇
+        """;
+    private static final String WELCOME_MESSAGE = """
+        Привіт! 🇺🇦
+        
+        Тут ви можете отримати актуальний графік відключень світла та підписатись на нагадування про відключення 💡
+        
+        Для того, щоб почати, натисніть кнопку "Ввести адресу 🏘"
+        """;
 
     public StartHandler(TelegramService telegramService, UserSessionService userSessionService) {
         super(telegramService, userSessionService);
@@ -22,7 +35,7 @@ public class StartHandler extends AbstractHandler {
 
     @Override
     public boolean isHandleable(UserSession session) {
-        return START.equals(session.getText());
+        return START_COMMAND.equals(session.getText());
     }
 
     @Override
@@ -47,11 +60,7 @@ public class StartHandler extends AbstractHandler {
             .build();
 
         return SendMessage.builder()
-            .text("""
-                Привіт! З поверненням! 🇺🇦
-                
-                Оберіть варіант з наведених нижче ⬇
-                """)
+            .text(WELCOME_BACK_MESSAGE)
             .chatId(session.getChatId())
             .replyMarkup(keyboard)
             .build();
@@ -63,13 +72,7 @@ public class StartHandler extends AbstractHandler {
             .build();
 
         return SendMessage.builder()
-            .text("""
-                Привіт! 🇺🇦
-                
-                Тут ви можете отримати актуальний графік відключень світла та підписатись на нагадування про відключення 💡
-                
-                Для того, щоб почати, натисніть кнопку "Ввести адресу 🏘"
-                """)
+            .text(WELCOME_MESSAGE)
             .chatId(session.getChatId())
             .replyMarkup(keyboard)
             .build();

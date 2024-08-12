@@ -16,7 +16,19 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 @Slf4j
 public class CheckShutdownStatusHandler extends AbstractHandler {
 
-    private static final String CHECK_SHUTDOWN_STATUS = "/check_shutdown_status";
+    private static final String CHECK_SHUTDOWN_STATUS_COMMAND = "/check_shutdown_status";
+
+    private static final String STATUS_MESSAGE_FORMAT = """
+        Статус відключення світла за адресою:
+        %s, %s, %s ⬇
+        ➖➖➖➖➖➖➖➖➖➖➖➖
+        %s
+        ➖➖➖➖➖➖➖➖➖➖➖➖
+        """;
+    private static final String CHECK_STATUS_MESSAGE_FORMAT = """
+        Перевіряємо статус відключення за вашою адресою 📶
+        
+        Зазвичай це займає 10-15 секунд 🙏""";
 
     private final ShutdownStatusService shutdownStatusService;
 
@@ -28,7 +40,7 @@ public class CheckShutdownStatusHandler extends AbstractHandler {
 
     @Override
     public boolean isHandleable(UserSession session) {
-        return CHECK_SHUTDOWN_STATUS.equals(session.getText());
+        return CHECK_SHUTDOWN_STATUS_COMMAND.equals(session.getText());
     }
 
     @Override
@@ -62,13 +74,8 @@ public class CheckShutdownStatusHandler extends AbstractHandler {
             userSessionService.saveUserSession(session);
         }
 
-        String textMessage = String.format("""
-            Статус відключення світла за адресою:
-            %s, %s, %s ⬇
-            ➖➖➖➖➖➖➖➖➖➖➖➖
-            %s
-            ➖➖➖➖➖➖➖➖➖➖➖➖
-            """, session.getUserCity(), session.getUserStreet(), session.getUserHouse(), status);
+        String textMessage = String.format(STATUS_MESSAGE_FORMAT, session.getUserCity(), session.getUserStreet(),
+            session.getUserHouse(), status);
 
         SendMessage message = SendMessage.builder()
             .chatId(session.getChatId())
@@ -82,10 +89,7 @@ public class CheckShutdownStatusHandler extends AbstractHandler {
     private void sendStatusLoadingMessage(UserSession session) {
         SendMessage message = SendMessage.builder()
             .chatId(session.getChatId())
-            .text("""
-                Перевіряємо статус відключення за вашою адресою 📶
-                
-                Зазвичай це займає 10-15 секунд 🙏""")
+            .text(CHECK_STATUS_MESSAGE_FORMAT)
             .build();
 
         telegramService.sendMessage(message);

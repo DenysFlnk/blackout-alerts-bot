@@ -23,6 +23,7 @@ public class AnnouncementService implements CommandLineRunner {
         Що змінилось:
         
         """;
+    private static final String BULLET_EMOJI = "◾";
 
     private final TelegramService telegramService;
 
@@ -51,7 +52,7 @@ public class AnnouncementService implements CommandLineRunner {
 
     private void addAnnouncements(StringBuilder patchNote, List<Announcement> announcements) {
         for (Announcement announcement : announcements) {
-            patchNote.append("◾");
+            patchNote.append(BULLET_EMOJI);
             patchNote.append(announcement.getText());
             patchNote.append(System.lineSeparator());
             patchNote.append(System.lineSeparator());

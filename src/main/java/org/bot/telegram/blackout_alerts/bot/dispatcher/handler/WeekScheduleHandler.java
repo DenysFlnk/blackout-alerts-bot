@@ -19,7 +19,16 @@ import org.telegram.telegrambots.meta.api.objects.InputFile;
 @Slf4j
 public class WeekScheduleHandler extends AbstractHandler {
 
-    private static final String WEEK_SCHEDULE = "/week_schedule";
+    private static final String WEEK_SCHEDULE_COMMAND = "/week_schedule";
+
+    private static final String FILE_NAME_FORMAT = "%s_withAddress_%s_%s_%s_date_%s";
+    private static final String IMAGE_CAPTION_FORMAT = """
+        Графік відключень на тиждень за адресою:
+        %s, %s, %s
+        
+        🚩 Зверніть увагу, що графік актуальний на %s.
+        Не забувайте час від часу надсилати запит на тижневий графік повторно, щоб бути впевненим в його актуальності ✅
+        """;
 
     private final ScheduleService scheduleService;
 
@@ -31,7 +40,7 @@ public class WeekScheduleHandler extends AbstractHandler {
 
     @Override
     public boolean isHandleable(UserSession session) {
-        return WEEK_SCHEDULE.equals(session.getText());
+        return WEEK_SCHEDULE_COMMAND.equals(session.getText());
     }
 
     @Override
@@ -58,7 +67,7 @@ public class WeekScheduleHandler extends AbstractHandler {
             userSessionService.saveUserSession(session);
         }
 
-        String fileName = String.format("%s_withAddress_%s_%s_%s_date_%s", session.getChatId(),
+        String fileName = String.format(FILE_NAME_FORMAT, session.getChatId(),
             session.getUserCity(), session.getUserStreet(), session.getUserHouse(), LocalDateTime.now());
         InputFile file = new InputFile(screenshot, fileName);
 
@@ -73,13 +82,7 @@ public class WeekScheduleHandler extends AbstractHandler {
     }
 
     public static String getCaption(UserSession session) {
-        return String.format("""
-            Графік відключень на тиждень за адресою:
-            %s, %s, %s
-            
-            🚩 Зверніть увагу, що графік актуальний на %s.
-            Не забувайте час від часу надсилати запит на тижневий графік повторно, щоб бути впевненим в його актуальності ✅
-            """, session.getUserCity(), session.getUserStreet(), session.getUserHouse(),
+        return String.format(IMAGE_CAPTION_FORMAT, session.getUserCity(), session.getUserStreet(), session.getUserHouse(),
             LocalDate.now());
     }
 }

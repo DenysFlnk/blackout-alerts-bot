@@ -16,6 +16,12 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 @AllArgsConstructor
 public class MessageDispatcher {
 
+    private static final String BASIC_EXCEPTION_MESSAGE = """
+         Схоже, що сталася помилка при обробці вашого запиту  😥
+        
+         Спробуйте, будь ласка, пізніше 🕛
+        """;
+
     private final List<Handler> handlers;
 
     private final TelegramService telegramService;
@@ -47,11 +53,7 @@ public class MessageDispatcher {
         log.error("Chat id: {}. Exception while dispatching message", session.getChatId(), e);
         SendMessage message = SendMessage.builder()
             .chatId(session.getChatId())
-            .text("""
-                 Схоже, що сталася помилка при обробці вашого запиту  😥
-                
-                 Спробуйте, будь ласка, пізніше 🕛
-                """)
+            .text(BASIC_EXCEPTION_MESSAGE)
             .build();
         telegramService.sendMessage(message);
     }

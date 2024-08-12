@@ -14,7 +14,16 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 @Slf4j
 public class ShowAddressHandler extends AbstractHandler {
 
-    private static final String SHOW_ADDRESS = "/show_address";
+    private static final String SHOW_ADDRESS_COMMAND = "/show_address";
+
+    private static final String NO_ENTRY = "Не вказано \uD83D\uDEAB";
+    private static final String ADDRESS_MESSAGE_FORMAT = """
+        🏘 Населенний пункт ➡ %s
+        
+        🛣 Вулиця ➡ %s
+        
+        🏚 Будинок ➡ %s
+        """;
 
     public ShowAddressHandler(TelegramService telegramService,
                               UserSessionService userSessionService) {
@@ -23,7 +32,7 @@ public class ShowAddressHandler extends AbstractHandler {
 
     @Override
     public boolean isHandleable(UserSession session) {
-        return SHOW_ADDRESS.equals(session.getText());
+        return SHOW_ADDRESS_COMMAND.equals(session.getText());
     }
 
     @Override
@@ -51,18 +60,10 @@ public class ShowAddressHandler extends AbstractHandler {
     }
 
     private static String getAddressMessage(UserSession session) {
-        String noEntry = "Не вказано \uD83D\uDEAB";
+        String city = session.getUserCity() != null ? session.getUserCity() : NO_ENTRY;
+        String street = session.getUserStreet() != null ? session.getUserStreet() : NO_ENTRY;
+        String house = session.getUserHouse() != null ? session.getUserHouse() : NO_ENTRY;
 
-        String city = session.getUserCity() != null ? session.getUserCity() : noEntry;
-        String street = session.getUserStreet() != null ? session.getUserStreet() : noEntry;
-        String house = session.getUserHouse() != null ? session.getUserHouse() : noEntry;
-
-        return String.format("""
-            🏘 Населенний пункт ➡ %s
-            
-            🛣 Вулиця ➡ %s
-            
-            🏚 Будинок ➡ %s
-            """, city, street, house);
+        return String.format(ADDRESS_MESSAGE_FORMAT, city, street, house);
     }
 }

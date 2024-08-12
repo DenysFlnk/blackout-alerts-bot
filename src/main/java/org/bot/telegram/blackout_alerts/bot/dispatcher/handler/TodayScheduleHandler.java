@@ -15,7 +15,9 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 @Slf4j
 public class TodayScheduleHandler extends AbstractHandler {
 
-    private static final String TODAY_SCHEDULE = "/today_schedule";
+    private static final String TODAY_SCHEDULE_COMMAND = "/today_schedule";
+
+    private static final String HTML = "HTML";
 
     private final ScheduleService scheduleService;
 
@@ -27,7 +29,7 @@ public class TodayScheduleHandler extends AbstractHandler {
 
     @Override
     public boolean isHandleable(UserSession session) {
-        return TODAY_SCHEDULE.equals(session.getText());
+        return TODAY_SCHEDULE_COMMAND.equals(session.getText());
     }
 
     @Override
@@ -56,7 +58,7 @@ public class TodayScheduleHandler extends AbstractHandler {
 
         SendMessage sendMessage = SendMessage.builder()
             .chatId(session.getChatId())
-            .parseMode("HTML")
+            .parseMode(HTML)
             .replyMarkup(KeyboardBuilder.builder().addReturnToMenuButton().build())
             .text(schedule)
             .build();

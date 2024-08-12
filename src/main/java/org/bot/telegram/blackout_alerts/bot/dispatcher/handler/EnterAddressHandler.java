@@ -20,7 +20,21 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 @Slf4j
 public class EnterAddressHandler extends AbstractHandler {
 
-    private static final String ENTER_ADDRESS = "/enter_address";
+    private static final String ENTER_ADDRESS_COMMAND = "/enter_address";
+
+    private static final String ENTER_CITY_MESSAGE = "👉 Введіть назву міста, наприклад - Київ";
+    private static final String ENTER_KYIV_STREET_MESSAGE = """
+        👉 Введіть назву вулиці, наприклад - вулиця Хрещатик
+        
+        Якщо це площа, проспект або бульвар - додайте на початок площа, проспект або бульвар замість вулиці відповідно
+        """;
+    private static final String ENTER_REGION_STREET_MESSAGE = "👉 Введіть назву вулиці, наприклад - Соборна ";
+    private static final String ENTER_HOUSE_MESSAGE = "👉 Введіть номер будинку, наприклад - 2б";
+    private static final String ADDRESS_ACQUIRED_MESSAGE = """
+        Адреса успішно збережена \uD83D\uDC4C
+        
+        ⬇ Доступні функції ⬇
+        """;
 
     public EnterAddressHandler(TelegramService telegramService, UserSessionService userSessionService) {
         super(telegramService, userSessionService);
@@ -28,7 +42,7 @@ public class EnterAddressHandler extends AbstractHandler {
 
     @Override
     public boolean isHandleable(UserSession session) {
-        return ENTER_ADDRESS.equals(session.getText()) ||
+        return ENTER_ADDRESS_COMMAND.equals(session.getText()) ||
                SessionState.WAIT_FOR_INPUTS.contains(session.getSessionState());
     }
 
@@ -36,7 +50,7 @@ public class EnterAddressHandler extends AbstractHandler {
     public void handle(UserSession session) {
         logStartHandle(session);
 
-        if (ENTER_ADDRESS.equals(session.getText())) {
+        if (ENTER_ADDRESS_COMMAND.equals(session.getText())) {
             telegramService.sendMessage(getEnterCityMessage(session));
 
             session.setSessionState(SessionState.WAIT_FOR_CITY);
@@ -81,32 +95,28 @@ public class EnterAddressHandler extends AbstractHandler {
 
     protected static SendMessage getEnterCityMessage(UserSession userSession) {
         return SendMessage.builder()
-            .text("👉 Введіть назву міста, наприклад - Київ")
+            .text(ENTER_CITY_MESSAGE)
             .chatId(userSession.getChatId())
             .build();
     }
 
     private static SendMessage getEnterKyivStreetMessage(UserSession userSession) {
         return SendMessage.builder()
-            .text("""
-                👉 Введіть назву вулиці, наприклад - вулиця Хрещатик
-                
-                Якщо це площа, проспект або бульвар - додайте на початок площа, проспект або бульвар замість вулиці відповідно
-                """)
+            .text(ENTER_KYIV_STREET_MESSAGE)
             .chatId(userSession.getChatId())
             .build();
     }
 
     private static SendMessage getEnterRegionStreetMessage(UserSession userSession) {
         return SendMessage.builder()
-            .text("👉 Введіть назву вулиці, наприклад - Соборна ")
+            .text(ENTER_REGION_STREET_MESSAGE)
             .chatId(userSession.getChatId())
             .build();
     }
 
     private static SendMessage getEnterHouseMessage(UserSession userSession) {
         return SendMessage.builder()
-            .text("👉 Введіть номер будинку, наприклад - 2б")
+            .text(ENTER_HOUSE_MESSAGE)
             .chatId(userSession.getChatId())
             .build();
     }
@@ -120,11 +130,7 @@ public class EnterAddressHandler extends AbstractHandler {
             .build();
 
         return SendMessage.builder()
-            .text("""
-                Адреса успішно збережена \uD83D\uDC4C
-                
-                ⬇ Доступні функції ⬇
-                """)
+            .text(ADDRESS_ACQUIRED_MESSAGE)
             .chatId(userSession.getChatId())
             .replyMarkup(keyboard)
             .build();
