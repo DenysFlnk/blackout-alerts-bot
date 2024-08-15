@@ -18,7 +18,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 public class AnnouncementService implements CommandLineRunner {
 
     private static final String START_MESSAGE = """
-        Привіт! Оновлення бота вже тут :arrows_clockwise:
+        Привіт! Оновлення бота вже тут 🔄
         
         Що змінилось:
         
