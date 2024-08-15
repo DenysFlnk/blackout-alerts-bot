@@ -27,7 +27,7 @@ public abstract class AbstractHandler implements Handler {
     }
 
     protected boolean isAddressAcquired(UserSession session) {
-        return !(session.getUserCity().isBlank() || session.getUserStreet().isBlank() || session.getUserHouse().isBlank());
+        return !(session.getUserCity() == null || session.getUserStreet() == null || session.getUserHouse() == null);
     }
 
     protected void sendAddressNotAcquiredMessage(UserSession session) {
