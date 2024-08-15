@@ -3,7 +3,6 @@ package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bot.telegram.blackout_alerts.exception.address.InvalidAddressException;
-import org.bot.telegram.blackout_alerts.model.session.SessionState;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.bot.telegram.blackout_alerts.service.TelegramService;
 import org.bot.telegram.blackout_alerts.service.UserSessionService;
@@ -28,7 +27,7 @@ public abstract class AbstractHandler implements Handler {
     }
 
     protected boolean isAddressAcquired(UserSession session) {
-        return SessionState.ADDRESS_ACQUIRED_STATES.contains(session.getSessionState());
+        return !(session.getUserCity().isBlank() || session.getUserStreet().isBlank() || session.getUserHouse().isBlank());
     }
 
     protected void sendAddressNotAcquiredMessage(UserSession session) {

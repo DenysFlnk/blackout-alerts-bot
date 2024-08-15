@@ -19,7 +19,4 @@ public enum SessionState {
 
     public static final Set<SessionState> WAIT_FOR_INPUTS = Sets.immutableEnumSet(WAIT_FOR_CITY, WAIT_FOR_STREET,
         WAIT_FOR_HOUSE_NUMBER);
-
-    public static final Set<SessionState> ADDRESS_ACQUIRED_STATES = Sets.immutableEnumSet(ADDRESS_ACQUIRED,
-        CHECK_SHUTDOWN_STATUS, TODAY_SCHEDULE, WEEK_SCHEDULE);
 }
