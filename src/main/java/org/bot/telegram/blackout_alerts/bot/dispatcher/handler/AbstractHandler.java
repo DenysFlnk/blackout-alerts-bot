@@ -15,6 +15,18 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 @Slf4j
 public abstract class AbstractHandler implements Handler {
 
+    private static final String ADDRESS_NOT_ACQUIRED_MESSAGE =
+        "❗ Необхідно ввести повну адресу для отримання графіку відключень";
+    private static final String SCHEDULE_LOADING_MESSAGE = """
+        Графік завантажується 😎
+        
+        Зазвичай це займає 10-15 секунд 🙏""";
+    private static final String CHOOSE_OPTION_MESSAGE_FORMAT = """
+        %s
+        
+        Оберіть одну з доступних опцій нижче, щоб спробувати ще 👇
+        """;
+
     protected final TelegramService telegramService;
 
     protected final UserSessionService userSessionService;
@@ -39,7 +51,7 @@ public abstract class AbstractHandler implements Handler {
 
         SendMessage message = SendMessage.builder()
             .chatId(session.getChatId())
-            .text("❗ Необхідно ввести повну адресу для отримання графіку відключень")
+            .text(ADDRESS_NOT_ACQUIRED_MESSAGE)
             .replyMarkup(keyboard)
             .build();
 
@@ -49,10 +61,7 @@ public abstract class AbstractHandler implements Handler {
     protected void sendScheduleLoadingMessage(UserSession session) {
         SendMessage message = SendMessage.builder()
             .chatId(session.getChatId())
-            .text("""
-                Графік завантажується 😎
-                
-                Зазвичай це займає 10-15 секунд 🙏""")
+            .text(SCHEDULE_LOADING_MESSAGE)
             .build();
 
         telegramService.sendMessage(message);
@@ -69,11 +78,7 @@ public abstract class AbstractHandler implements Handler {
             log.info("Chat id: {}. Give {} another {} options", session.getChatId(),
                 e.getAvailableOptions().size(), e.getAddressField());
             String firstLineFromOriginalMessage = e.getMessage().split(System.lineSeparator())[0];
-            messageBuilder.text(String.format("""
-                %s
-                
-                Оберіть одну з доступних опцій нижче, щоб спробувати ще 👇
-                """, firstLineFromOriginalMessage))
+            messageBuilder.text(String.format(CHOOSE_OPTION_MESSAGE_FORMAT, firstLineFromOriginalMessage))
                 .replyMarkup(KeyboardBuilder.builder().addAddressOptions(e.getAddressField(), e.getAvailableOptions()).build());
         }
 
