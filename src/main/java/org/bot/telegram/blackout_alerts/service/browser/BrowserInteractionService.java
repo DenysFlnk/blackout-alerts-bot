@@ -221,7 +221,16 @@ public class BrowserInteractionService {
 
         int count = driver.findElements(By.xpath(XPATH_CITY_AUTOCOMPLETE_LIST)).size();
 
+        // Workaround DTEK bug
         if (count == 0) {
+            String cityWithoutLastLetter = userCity.substring(0, userCity.length() - 1);
+            fillInput(input, cityWithoutLastLetter);
+            count = driver.findElements(By.xpath(XPATH_CITY_AUTOCOMPLETE_LIST)).size();
+            session.setUserCity(cityWithoutLastLetter);
+        }
+
+        if (count == 0) {
+            session.setUserCity(userCity);
             throw new InvalidAddressException(AddressField.CITY, userCity);
         }
 
