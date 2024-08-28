@@ -1,5 +1,7 @@
 package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 
+import static org.bot.telegram.blackout_alerts.util.ScheduleUtil.UTC_PLUS_3;
+
 import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -83,6 +85,6 @@ public class WeekScheduleHandler extends AbstractHandler {
 
     public static String getCaption(UserSession session) {
         return String.format(IMAGE_CAPTION_FORMAT, session.getUserCity(), session.getUserStreet(), session.getUserHouse(),
-            LocalDate.now());
+            LocalDate.now(UTC_PLUS_3));
     }
 }

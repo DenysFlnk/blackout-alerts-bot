@@ -7,6 +7,7 @@ import com.google.gson.reflect.TypeToken;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -44,15 +45,18 @@ public class ScheduleUtil {
         possibilityToEmojiMap.put(Possibility.MAYBE, "\uD83D\uDFE1");
     }
 
+    public static final ZoneId UTC_PLUS_3 = ZoneId.of("UTC+3");
+
     private ScheduleUtil() {
     }
 
     public static LocalDateTime getScheduleExpireDate() {
-        return LocalDateTime.now().plusDays(7);
+        return LocalDateTime.now(UTC_PLUS_3).plusDays(7);
     }
 
     public static String renderTodaySchedule(Schedule schedule) {
-        DayOfWeek today = LocalDate.now().getDayOfWeek();
+        LocalDate now = LocalDate.now(UTC_PLUS_3);
+        DayOfWeek today = now.getDayOfWeek();
         List<Pair<String, String>> currentDayPossibilities = schedule.getWeekListMap().get(today);
         List<String> headerList = Arrays.asList("\uD83D\uDD54", "\uD83D\uDCA1");
         List<List<String>> rowList = currentDayPossibilities.stream()
@@ -66,7 +70,7 @@ public class ScheduleUtil {
         board.setInitialBlock(table.tableToBlocks());
         board.build();
 
-        return String.format(TABLE_LEGEND_FORMAT, LocalDate.now(), board.getPreview());
+        return String.format(TABLE_LEGEND_FORMAT, now, board.getPreview());
     }
 
     public static ZoneSchedule getZoneSchedule(UserSession session, String scheduleJson) {
