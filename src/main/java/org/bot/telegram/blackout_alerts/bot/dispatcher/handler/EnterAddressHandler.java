@@ -4,6 +4,7 @@ import static org.bot.telegram.blackout_alerts.util.AddressUtil.isKyiv;
 import static org.bot.telegram.blackout_alerts.util.AddressUtil.parseHouseNumber;
 import static org.bot.telegram.blackout_alerts.util.AddressUtil.parseKyivStreetPrefix;
 import static org.bot.telegram.blackout_alerts.util.ValidationUtil.validateCityInput;
+import static org.bot.telegram.blackout_alerts.util.ValidationUtil.validateHouseInput;
 import static org.bot.telegram.blackout_alerts.util.ValidationUtil.validateStreetInput;
 
 import lombok.extern.slf4j.Slf4j;
@@ -79,7 +80,9 @@ public class EnterAddressHandler extends AbstractHandler {
             }
             case WAIT_FOR_HOUSE_NUMBER -> {
                 log.info("Chat id: {}. Entered house: {}", session.getChatId(), session.getText());
-                String house = parseHouseNumber(session.getText());
+                String text = session.getText();
+                validateHouseInput(text);
+                String house = parseHouseNumber(text);
                 session.setUserHouse(house);
                 message = getAddressAcquiredMessage(session);
                 session.setSessionState(SessionState.ADDRESS_ACQUIRED);

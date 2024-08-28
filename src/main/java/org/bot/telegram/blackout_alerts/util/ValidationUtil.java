@@ -6,6 +6,8 @@ import org.bot.telegram.blackout_alerts.exception.address.AddressField;
 
 public class ValidationUtil {
 
+    private static final String EMPTY = "";
+
     private ValidationUtil() {
     }
 
@@ -37,6 +39,16 @@ public class ValidationUtil {
         }
     }
 
+    public static void validateHouseInput(String street) {
+        Predicate<String> predicate = notContainsDigit();
+
+        boolean isInvalid = predicate.test(street);
+
+        if (isInvalid) {
+            throw new InvalidInputException(AddressField.STREET, street);
+        }
+    }
+
     private static Predicate<String> isBlank() {
         return input -> input == null || input.isBlank();
     }
@@ -44,7 +56,7 @@ public class ValidationUtil {
     private static Predicate<String> containsForbiddenCharacters() {
         return input -> {
             int length = input.length();
-            String checked = input.replaceAll("[,\\d\\\\/_|]", "");
+            String checked = input.replaceAll("[,\\d\\\\/_|]", EMPTY);
             return length != checked.length();
         };
     }
@@ -52,7 +64,7 @@ public class ValidationUtil {
     private static Predicate<String> containsEnglishLetters() {
         return input -> {
             int length = input.length();
-            String checked = input.replaceAll("\\w", "");
+            String checked = input.replaceAll("\\w", EMPTY);
             return length != checked.length();
         };
     }
@@ -60,7 +72,7 @@ public class ValidationUtil {
     private static Predicate<String> containsRussianLetters() {
         return input -> {
             int length = input.length();
-            String checked = input.replace("ы", "");
+            String checked = input.replace("ы", EMPTY);
             return length != checked.length();
         };
     }
@@ -68,12 +80,20 @@ public class ValidationUtil {
     private static Predicate<String> containsCityType() {
         return input -> {
             int length = input.length();
-            String checked = input.toLowerCase().replaceAll("(село|смт|місто|район|область)", "");
+            String checked = input.toLowerCase().replaceAll("(село|смт|місто|район|область)", EMPTY);
             return length != checked.length();
         };
     }
 
     private static Predicate<String> containsDot() {
         return input ->  input.contains(".");
+    }
+
+    private static Predicate<String> notContainsDigit() {
+        return input -> {
+            int length = input.length();
+            String checked = input.replaceAll("\\d", EMPTY);
+            return length == checked.length();
+        };
     }
 }
