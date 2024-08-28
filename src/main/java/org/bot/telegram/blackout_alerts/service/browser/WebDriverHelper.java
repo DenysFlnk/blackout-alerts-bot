@@ -32,6 +32,7 @@ public class WebDriverHelper {
     }
 
     protected static void releaseWebDriverWithAwaits(BrowserInteractionService service) {
+        service.getDriver().close();
         service.getDriver().quit();
         service.setDriver(null);
         service.setPageAwait(null);
