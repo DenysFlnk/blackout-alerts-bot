@@ -73,7 +73,7 @@ public abstract class AbstractHandler implements Handler {
 
         if (e.getAvailableOptions() == null || e.getAvailableOptions().isEmpty()) {
             messageBuilder.text(e.getMessage())
-                .replyMarkup(KeyboardBuilder.builder().addEnterAddressButton().build());
+                .replyMarkup(KeyboardBuilder.builder().addShowAddressButton().addEnterAddressButton().build());
         } else {
             log.info("Chat id: {}. Give {} another {} options", session.getChatId(),
                 e.getAvailableOptions().size(), e.getAddressField());
