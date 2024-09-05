@@ -18,6 +18,7 @@ public class AddressUtil {
         streetPrefixMap.put("площа", "пл.");
         streetPrefixMap.put("проспект", "просп.");
         streetPrefixMap.put("бульвар", "бульв.");
+        streetPrefixMap.put("провулок", "пров.");
     }
 
     private static final Set<String> streetPrefixSet = new HashSet<>(streetPrefixMap.values());
