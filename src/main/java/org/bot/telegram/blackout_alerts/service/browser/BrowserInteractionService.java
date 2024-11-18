@@ -63,10 +63,11 @@ public class BrowserInteractionService {
     public String getShutDownSchedule(UserSession session) {
         String userCity = session.getUserCity();
         acquireWebDriverWithAwaits(this, userCity);
-        awaitForDtekPage();
 
         String schedule;
         try {
+            awaitForDtekPage();
+
             if (isKyiv(userCity)) {
                 fillKyivInputs(session);
             } else {
