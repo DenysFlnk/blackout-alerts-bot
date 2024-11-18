@@ -20,6 +20,7 @@ public class KeyboardBuilder {
     private static final InlineKeyboardButton manageAlertSubscriptionButton = manageAlertSubscriptionButton();
     private static final InlineKeyboardButton createAlertSubscriptionButton = createAlertSubscriptionButton();
     private static final InlineKeyboardButton deleteAlertSubscriptionButton = deleteAlertSubscriptionButton();
+    private static final InlineKeyboardButton broadcastMessageButton = broadcastMessageButton();
 
     private final List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
@@ -99,6 +100,11 @@ public class KeyboardBuilder {
 
     public KeyboardBuilder addDeleteAlertSubscriptionButton() {
         keyboard.add(Collections.singletonList(deleteAlertSubscriptionButton));
+        return this;
+    }
+
+    public KeyboardBuilder addBroadcastMessageButton() {
+        keyboard.add(Collections.singletonList(broadcastMessageButton));
         return this;
     }
 
@@ -182,6 +188,13 @@ public class KeyboardBuilder {
         InlineKeyboardButton button = new InlineKeyboardButton();
         button.setText("Відписатись від сповіщення 📵");
         button.setCallbackData("/remove_alert_subscription");
+        return button;
+    }
+
+    private static InlineKeyboardButton broadcastMessageButton() {
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText("Broadcast message to all \uD83C\uDF0D");
+        button.setCallbackData("/broadcast");
         return button;
     }
 }

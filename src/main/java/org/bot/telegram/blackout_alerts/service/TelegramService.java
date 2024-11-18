@@ -1,5 +1,7 @@
 package org.bot.telegram.blackout_alerts.service;
 
+import java.util.List;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.bot.telegram.blackout_alerts.bot.TelegramBotSender;
 import org.bot.telegram.blackout_alerts.exception.MessageSenderException;
@@ -30,6 +32,17 @@ public class TelegramService {
         }
     }
 
+    public void sendMessages(List<SendMessage> messages) {
+        for (SendMessage message : messages) {
+            try {
+                sendMessage(message);
+            } catch (MessageSenderException e) {
+                log.warn("Exception while sending broadcast message for user with id {}. {}", message.getChatId(),
+                    e.getMessage());
+            }
+        }
+    }
+
     public void sendPhoto(SendPhoto message) {
         try {
             sender.execute(message);
@@ -45,5 +58,9 @@ public class TelegramService {
         } catch (TelegramApiException e) {
             log.error("Error while sending message {} to admin", message.getText(), e);
         }
+    }
+
+    public boolean isAdmin(long chatId) {
+        return adminId == chatId;
     }
 }

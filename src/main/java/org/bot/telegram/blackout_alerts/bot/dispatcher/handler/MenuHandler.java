@@ -42,6 +42,10 @@ public class MenuHandler extends AbstractHandler {
             keyboardBuilder.addEnterAddressButton();
         }
 
+        if (telegramService.isAdmin(session.getChatId())) {
+            keyboardBuilder.addBroadcastMessageButton();
+        }
+
         SendMessage message = SendMessage.builder()
             .chatId(session.getChatId())
             .text(CHOOSE_OPTION_MESSAGE)

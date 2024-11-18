@@ -16,7 +16,9 @@ public enum SessionState {
     QUESTION_ASKED,
     ANSWER_TO_USER,
     QUESTION_ANSWERED,
-    ALERT_SUBSCRIPTION;
+    ALERT_SUBSCRIPTION,
+    START_BROADCAST,
+    END_BROADCAST;
 
     public static final Set<SessionState> WAIT_FOR_INPUTS = Sets.immutableEnumSet(WAIT_FOR_CITY, WAIT_FOR_STREET,
         WAIT_FOR_HOUSE_NUMBER);
