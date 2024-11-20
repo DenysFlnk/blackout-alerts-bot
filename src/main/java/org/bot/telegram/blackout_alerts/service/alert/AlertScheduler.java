@@ -53,7 +53,7 @@ public class AlertScheduler {
     private final Map<Byte, Schedule> regionZoneScheduleMap = new HashMap<>();
 
     private final LocalDate scheduleExpire = LocalDate.now().plusDays(3);
-    private static final ZoneId UTC_PLUS_3 = ZoneId.of("UTC+3");
+    private static final ZoneId UTC_PLUS_3 = ZoneId.of("UTC+2");
 
     @Scheduled(cron = "0 45 * * * *")
     private void sendAlert() {
