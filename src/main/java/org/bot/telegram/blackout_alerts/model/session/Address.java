@@ -11,5 +11,5 @@ public class Address {
 
     private String house;
 
-    private byte shutdownGroup;
+    private String shutdownGroup;
 }

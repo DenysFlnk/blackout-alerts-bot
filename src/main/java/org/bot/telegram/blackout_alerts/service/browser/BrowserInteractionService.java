@@ -341,7 +341,7 @@ public class BrowserInteractionService {
 
     private void setShutdownGroupByJS(UserSession session) {
         String json = (String) ((JavascriptExecutor) driver).executeScript(JS_GET_GROUP);
-        session.setShutdownGroup(Byte.parseByte(json));
+        session.setShutdownGroup(json.replace("\"", ""));
     }
 
     private String getScheduleByJS() {

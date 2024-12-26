@@ -4,40 +4,86 @@ import com.google.gson.annotations.SerializedName;
 
 public class ShutDownSchedule {
 
-    @SerializedName("1")
-    Group group1;
-    @SerializedName("2")
-    Group group2;
-    @SerializedName("3")
-    Group group3;
-    @SerializedName("4")
-    Group group4;
-    @SerializedName("5")
-    Group group5;
-    @SerializedName("6")
-    Group group6;
+    private static final String GROUP1_1 = "1.1";
+    private static final String GROUP1_2 = "1.2";
+    private static final String GROUP2_1 = "2.1";
+    private static final String GROUP2_2 = "2.2";
+    private static final String GROUP3_1 = "3.1";
+    private static final String GROUP3_2 = "3.2";
+    private static final String GROUP4_1 = "4.1";
+    private static final String GROUP4_2 = "4.2";
+    private static final String GROUP5_1 = "5.1";
+    private static final String GROUP5_2 = "5.2";
+    private static final String GROUP6_1 = "6.1";
+    private static final String GROUP6_2 = "6.2";
 
-    public Group getGroup(int groupNumber) {
+    public static final String[] groups = {GROUP1_1, GROUP1_2, GROUP2_1, GROUP2_2, GROUP3_1, GROUP3_2,
+        GROUP4_1, GROUP4_2, GROUP5_1, GROUP5_2, GROUP6_1, GROUP6_2};
+
+    @SerializedName(GROUP1_1)
+    Group group1_1;
+    @SerializedName(GROUP1_2)
+    Group group1_2;
+    @SerializedName(GROUP2_1)
+    Group group2_1;
+    @SerializedName(GROUP2_2)
+    Group group2_2;
+    @SerializedName(GROUP3_1)
+    Group group3_1;
+    @SerializedName(GROUP3_2)
+    Group group3_2;
+    @SerializedName(GROUP4_1)
+    Group group4_1;
+    @SerializedName(GROUP4_2)
+    Group group4_2;
+    @SerializedName(GROUP5_1)
+    Group group5_1;
+    @SerializedName(GROUP5_2)
+    Group group5_2;
+    @SerializedName(GROUP6_1)
+    Group group6_1;
+    @SerializedName(GROUP6_2)
+    Group group6_2;
+
+    public Group getGroup(String groupNumber) {
         switch (groupNumber) {
-            case 1 -> {
-                return group1;
+            case GROUP1_1 -> {
+                return group1_1;
             }
-            case 2 -> {
-                return group2;
+            case GROUP1_2 -> {
+                return group1_2;
             }
-            case 3 -> {
-                return group3;
+            case GROUP2_1 -> {
+                return group2_1;
             }
-            case 4 -> {
-                return group4;
+            case GROUP2_2 -> {
+                return group2_2;
             }
-            case 5 -> {
-                return group5;
+            case GROUP3_1 -> {
+                return group3_1;
             }
-            case 6 -> {
-                return group6;
+            case GROUP3_2 -> {
+                return group3_2;
             }
-            default -> throw new IllegalArgumentException("Invalid group number");
+            case GROUP4_1 -> {
+                return group4_1;
+            }
+            case GROUP4_2 -> {
+                return group4_2;
+            }
+            case GROUP5_1 -> {
+                return group5_1;
+            }
+            case GROUP5_2 -> {
+                return group5_2;
+            }
+            case GROUP6_1 -> {
+                return group6_1;
+            }
+            case GROUP6_2 -> {
+                return group6_2;
+            }
+            default -> throw new IllegalArgumentException("Invalid group number - " + groupNumber);
         }
     }
 }

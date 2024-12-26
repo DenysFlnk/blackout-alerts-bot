@@ -43,22 +43,25 @@ public class AlertScheduler {
         Згідно графіку погодинних відключень 🗓️
         """;
 
+    public static final int MINUTE_15 = 15;
+    public static final int MINUTE_45 = 45;
+
     private final TelegramService telegramService;
 
     private final AlertSubscriptionService alertSubscriptionService;
 
     private final ZoneScheduleRepository scheduleRepository;
 
-    private final Map<Byte, Schedule> kyivZoneScheduleMap = new HashMap<>();
-    private final Map<Byte, Schedule> regionZoneScheduleMap = new HashMap<>();
+    private final Map<String, Schedule> kyivZoneScheduleMap = new HashMap<>();
+    private final Map<String, Schedule> regionZoneScheduleMap = new HashMap<>();
 
     private final LocalDate scheduleExpire = LocalDate.now().plusDays(3);
-    private static final ZoneId UTC_PLUS_3 = ZoneId.of("UTC+2");
+    private static final ZoneId UTC_PLUS_2 = ZoneId.of("UTC+2");
 
-    @Scheduled(cron = "0 45 * * * *")
+    @Scheduled(cron = "0 15,45 * * * *")
     private void sendAlert() {
         log.info("AlertScheduler is up");
-        LocalDateTime now = LocalDateTime.now(UTC_PLUS_3);
+        LocalDateTime now = LocalDateTime.now(UTC_PLUS_2);
 
         if (isRestrictedHours(now.toLocalTime())) {
             log.info("Skipping alerts due to restricted hours");
@@ -70,7 +73,7 @@ public class AlertScheduler {
         List<AlertSubscription> subscriptions = alertSubscriptionService.getAllAlertSubscriptions();
         for (AlertSubscription subscription : subscriptions) {
             Zone zone = Zone.findZone(subscription.getAddress().getCity());
-            byte group = subscription.getAddress().getShutdownGroup();
+            String group = subscription.getAddress().getShutdownGroup();
 
             if (isShutdownIncoming(zone, group, now)) {
                 sendNotification(subscription);
@@ -78,34 +81,33 @@ public class AlertScheduler {
         }
     }
 
-    public static boolean isRestrictedHours(LocalTime time) {
-        return time.isAfter(LocalTime.of(22, 0)) || time.isBefore(LocalTime.of(8, 0));
+    private static boolean isRestrictedHours(LocalTime time) {
+        return time.isAfter(LocalTime.of(23, 0)) || time.isBefore(LocalTime.of(8, 0));
     }
 
     private void updateZoneScheduleMaps() {
         if (LocalDate.now().isAfter(scheduleExpire) || kyivZoneScheduleMap.isEmpty() || regionZoneScheduleMap.isEmpty()) {
-            int zoneCount = ShutDownSchedule.class.getDeclaredFields().length;
-            updateZoneScheduleMap(kyivZoneScheduleMap, Zone.KYIV, zoneCount);
-            updateZoneScheduleMap(regionZoneScheduleMap, Zone.REGIONS, zoneCount);
+            updateZoneScheduleMap(kyivZoneScheduleMap, Zone.KYIV);
+            updateZoneScheduleMap(regionZoneScheduleMap, Zone.REGIONS);
         }
     }
 
-    private void updateZoneScheduleMap(Map<Byte, Schedule> map, Zone zone, int zoneCount) {
+    private void updateZoneScheduleMap(Map<String, Schedule> map, Zone zone) {
         Optional<ZoneSchedule> zoneScheduleOptional = scheduleRepository.findById(zone);
 
         if (zoneScheduleOptional.isPresent()) {
             map.clear();
             ZoneSchedule zoneSchedule = zoneScheduleOptional.get();
 
-            for (byte i = 1; i <= zoneCount; i++) {
-                Schedule schedule = ScheduleUtil.parseSchedule(zoneSchedule.getScheduleJson(), i);
-                map.put(i, schedule);
+            for (String group : ShutDownSchedule.groups) {
+                Schedule schedule = ScheduleUtil.parseSchedule(zoneSchedule.getScheduleJson(), group);
+                map.put(group, schedule);
             }
         }
     }
 
-    private boolean isShutdownIncoming(Zone zone, byte group, LocalDateTime currentTime) {
-        Map<Byte, Schedule> scheduleMap = zone == Zone.KYIV ? kyivZoneScheduleMap : regionZoneScheduleMap;
+    private boolean isShutdownIncoming(Zone zone, String group, LocalDateTime currentTime) {
+        Map<String, Schedule> scheduleMap = zone == Zone.KYIV ? kyivZoneScheduleMap : regionZoneScheduleMap;
         Map<Integer, Possibility> hourPossibilityMap = scheduleMap.get(group).getWeekListMap()
             .get(currentTime.getDayOfWeek()).stream()
             .filter(pair -> pair.getFirst().getHour() == currentTime.getHour() ||
@@ -116,8 +118,19 @@ public class AlertScheduler {
     }
 
     private static boolean isShutdownIncoming(LocalDateTime currentTime, Map<Integer, Possibility> hourPossibilityMap) {
-        return hourPossibilityMap.get(currentTime.getHour()) == Possibility.YES
-               && hourPossibilityMap.get(currentTime.getHour() + 1) == Possibility.NO;
+        Possibility currentHour = hourPossibilityMap.get(currentTime.getHour());
+        Possibility nextHour = hourPossibilityMap.get(currentTime.getHour() + 1);
+
+        int currentMinute = currentTime.getMinute();
+
+        if (currentMinute == MINUTE_15) {
+            return currentHour == Possibility.SECOND && (nextHour == Possibility.NO || nextHour == Possibility.MAYBE);
+        } else if (currentMinute == MINUTE_45) {
+            return currentHour == Possibility.YES && (nextHour == Possibility.NO || nextHour == Possibility.MAYBE);
+        } else {
+            log.info("Unexpected scheduler time : {}", currentTime);
+            throw new IllegalStateException("Unexpected scheduler minute value: " + currentMinute);
+        }
     }
 
     private void sendNotification(AlertSubscription subscription) {

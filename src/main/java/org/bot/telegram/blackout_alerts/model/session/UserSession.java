@@ -28,7 +28,7 @@ public class UserSession {
         address.setHouse(house);
     }
 
-    public void setShutdownGroup(byte shutdownGroup) {
+    public void setShutdownGroup(String shutdownGroup) {
         address.setShutdownGroup(shutdownGroup);
     }
 
@@ -44,7 +44,7 @@ public class UserSession {
         return address.getHouse();
     }
 
-    public byte getShutdownGroup() {
+    public String getShutdownGroup() {
         return address.getShutdownGroup();
     }
 }

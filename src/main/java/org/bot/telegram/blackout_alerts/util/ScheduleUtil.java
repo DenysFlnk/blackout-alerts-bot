@@ -36,12 +36,16 @@ public class ScheduleUtil {
         \uD83D\uDFE2 - світло є
         \uD83D\uDD34 - світло відсутнє
         \uD83D\uDFE1 - можливе відключення
+        \uD83D\uDD35 - світла не буде перші 30хв
+        \uD83D\uDFE0 - світла не буде другі 30хв
         </pre>""";
 
     static {
         possibilityToEmojiMap.put(Possibility.YES, "\uD83D\uDFE2");
         possibilityToEmojiMap.put(Possibility.NO, "\uD83D\uDD34");
         possibilityToEmojiMap.put(Possibility.MAYBE, "\uD83D\uDFE1");
+        possibilityToEmojiMap.put(Possibility.FIRST, "\uD83D\uDD35");
+        possibilityToEmojiMap.put(Possibility.SECOND, "\uD83D\uDFE0");
     }
 
     public static final ZoneId UTC_PLUS_3 = ZoneId.of("UTC+3");
@@ -80,7 +84,7 @@ public class ScheduleUtil {
         return zoneSchedule;
     }
 
-    public static Schedule parseSchedule(String scheduleJson, byte group) {
+    public static Schedule parseSchedule(String scheduleJson, String group) {
         TypeToken<ShutDownSchedule> token = new TypeToken<>() {};
         ShutDownSchedule shutDownSchedule =  new Gson().fromJson(scheduleJson, token.getType());
 
