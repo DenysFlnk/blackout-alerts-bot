@@ -7,7 +7,9 @@ import java.util.Set;
 
 public class AddressUtil {
 
-    private static final String KYIV = "Київ";
+    public static final String KYIV = "Київ";
+    public static final String REGION = "Область";
+
 
     private static final Map<String, String> streetPrefixMap = new HashMap<>();
 

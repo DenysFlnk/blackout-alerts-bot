@@ -39,6 +39,12 @@ public class ScheduleService {
         return screenshot;
     }
 
+    public byte[] getCommonScheduleScreenshot(UserSession session, String city) {
+        byte[] screenshot = browserService.getCommonShutdownScheduleScreenshot(city);
+        log.info("Chat id: {}. Success getting common shutdown schedule screenshot", session.getChatId());
+        return screenshot;
+    }
+
     public String getRenderedTodaySchedule(UserSession session) {
         Schedule schedule = getShutdownScheduleFromDb(session)
             .orElseGet(() -> getShutdownScheduleFromWeb(session));

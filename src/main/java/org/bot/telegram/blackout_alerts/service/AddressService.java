@@ -20,7 +20,7 @@ public class AddressService {
 
     private final AddressEntityRepository addressRepository;
 
-    protected Optional<Address> getAddressFromDb(UserSession session) {
+    public Optional<Address> getAddressFromDb(UserSession session) {
         List<AddressEntity> addresses = addressRepository.findAllByCityContainsAndStreetContainsAndHouse(
             session.getUserCity(), session.getUserStreet(), session.getUserHouse());
 

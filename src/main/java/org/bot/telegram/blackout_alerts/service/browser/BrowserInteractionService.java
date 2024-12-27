@@ -11,6 +11,7 @@ import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_CITY_A
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_CITY_AUTOCOMPLETE_LIST;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_CITY_INPUT;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_CLOSE_MODAL_BTN;
+import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_COMMON_SCHEDULE_IMG;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_AUTOCOMPLETE;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_AUTOCOMPLETE_LIST;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_INPUT;
@@ -105,6 +106,21 @@ public class BrowserInteractionService {
         }
 
         return new ByteArrayInputStream(screenshotBytes);
+    }
+
+    public byte[] getCommonShutdownScheduleScreenshot(String city) {
+        acquireWebDriverWithAwaits(this, city);
+        driver.manage().window().setSize(new Dimension(1024, 1080));
+        awaitForDtekPage();
+
+        byte[] screenshotBytes;
+        try {
+            screenshotBytes = getScreenshotOfElementLocated(XPATH_COMMON_SCHEDULE_IMG);
+        } finally {
+            releaseWebDriverWithAwaits(this);
+        }
+
+        return screenshotBytes;
     }
 
     public String getShutdownStatus(UserSession session) {

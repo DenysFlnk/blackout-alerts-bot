@@ -36,10 +36,14 @@ public class MenuHandler extends AbstractHandler {
                 .addChangeAddressButton()
                 .addShowScheduleButton()
                 .addShowWeekScheduleButton()
+                .addCommonKyivScheduleButton()
+                .addCommonRegionsScheduleButton()
                 .addCheckShutdownStatusButton()
                 .addManageAlertSubscriptionButton();
         } else {
-            keyboardBuilder.addEnterAddressButton();
+            keyboardBuilder.addEnterAddressButton()
+                .addCommonKyivScheduleButton()
+                .addCommonRegionsScheduleButton();
         }
 
         if (telegramService.isAdmin(session.getChatId())) {

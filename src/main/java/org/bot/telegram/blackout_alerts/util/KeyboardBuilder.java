@@ -21,6 +21,8 @@ public class KeyboardBuilder {
     private static final InlineKeyboardButton createAlertSubscriptionButton = createAlertSubscriptionButton();
     private static final InlineKeyboardButton deleteAlertSubscriptionButton = deleteAlertSubscriptionButton();
     private static final InlineKeyboardButton broadcastMessageButton = broadcastMessageButton();
+    private static final InlineKeyboardButton commonKyivScheduleButton = commonKyivScheduleButton();
+    private static final InlineKeyboardButton commonRegionsScheduleButton = commonRegionsScheduleButton();
 
     private final List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
@@ -105,6 +107,16 @@ public class KeyboardBuilder {
 
     public KeyboardBuilder addBroadcastMessageButton() {
         keyboard.add(Collections.singletonList(broadcastMessageButton));
+        return this;
+    }
+
+    public KeyboardBuilder addCommonKyivScheduleButton() {
+        keyboard.add(Collections.singletonList(commonKyivScheduleButton));
+        return this;
+    }
+
+    public KeyboardBuilder addCommonRegionsScheduleButton() {
+        keyboard.add(Collections.singletonList(commonRegionsScheduleButton));
         return this;
     }
 
@@ -195,6 +207,20 @@ public class KeyboardBuilder {
         InlineKeyboardButton button = new InlineKeyboardButton();
         button.setText("Broadcast message to all \uD83C\uDF0D");
         button.setCallbackData("/broadcast");
+        return button;
+    }
+
+    private static InlineKeyboardButton commonKyivScheduleButton() {
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText("Загальний графік для м. Київ \uD83D\uDDD3\uFE0F");
+        button.setCallbackData("/common_kyiv_schedule");
+        return button;
+    }
+
+    private static InlineKeyboardButton commonRegionsScheduleButton() {
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText("Загальний графік для Київської області \uD83D\uDDD3\uFE0F");
+        button.setCallbackData("/common_regions_schedule");
         return button;
     }
 }

@@ -38,6 +38,7 @@ public class BrowserPageUtil {
     public static final String XPATH_CLOSE_MODAL_BTN = "//button[contains(@class,'modal__close')]";
 
     public static final String XPATH_SCHEDULE_TABLE = "//div[contains(@class,'discon-schedule-table')]//table";
+    public static final String XPATH_COMMON_SCHEDULE_IMG = "//section//picture/img";
 
     public static final String XPATH_SHUTDOWN_STATUS = "//div[@id='showCurOutage']/p";
 

@@ -1,7 +1,10 @@
 package org.bot.telegram.blackout_alerts.bot.dispatcher.handler;
 
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.bot.telegram.blackout_alerts.model.session.Address;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
+import org.bot.telegram.blackout_alerts.service.AddressService;
 import org.bot.telegram.blackout_alerts.service.TelegramService;
 import org.bot.telegram.blackout_alerts.service.UserSessionService;
 import org.bot.telegram.blackout_alerts.util.KeyboardBuilder;
@@ -23,11 +26,16 @@ public class ShowAddressHandler extends AbstractHandler {
         🛣 Вулиця ➡ %s
         
         🏚 Будинок ➡ %s
+        
+        📋 Група відключень ➡ %s
         """;
 
-    public ShowAddressHandler(TelegramService telegramService,
-                              UserSessionService userSessionService) {
+    private final AddressService addressService;
+
+    public ShowAddressHandler(TelegramService telegramService, UserSessionService userSessionService,
+                              AddressService addressService) {
         super(telegramService, userSessionService);
+        this.addressService = addressService;
     }
 
     @Override
@@ -60,11 +68,19 @@ public class ShowAddressHandler extends AbstractHandler {
         telegramService.sendMessage(messageBuilder.build());
     }
 
-    private static String getAddressMessage(UserSession session) {
+    private String getAddressMessage(UserSession session) {
         String city = session.getUserCity() != null ? session.getUserCity() : NO_ENTRY;
         String street = session.getUserStreet() != null ? session.getUserStreet() : NO_ENTRY;
         String house = session.getUserHouse() != null ? session.getUserHouse() : NO_ENTRY;
 
-        return String.format(ADDRESS_MESSAGE_FORMAT, city, street, house);
+        String group = NO_ENTRY;
+
+        Optional<Address> addressOptional = addressService.getAddressFromDb(session);
+        if (addressOptional.isPresent()) {
+            Address address = addressOptional.get();
+            group = address.getShutdownGroup();
+        }
+
+        return String.format(ADDRESS_MESSAGE_FORMAT, city, street, house, group);
     }
 }
