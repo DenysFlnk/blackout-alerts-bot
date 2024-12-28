@@ -4,7 +4,7 @@ import static org.bot.telegram.blackout_alerts.util.AddressUtil.KYIV;
 import static org.bot.telegram.blackout_alerts.util.AddressUtil.REGION;
 
 import java.io.ByteArrayInputStream;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
 import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.bot.telegram.blackout_alerts.service.ScheduleService;
@@ -27,10 +27,10 @@ public class CommonScheduleHandler extends AbstractHandler {
     private static final String CAPTION_FORMAT = "Загальний графік для %s \uD83D\uDDD3\uFE0F";
 
     private static byte[] commonKyivSchedule;
-    private static LocalDateTime commonKyivScheduleDate = LocalDateTime.MIN;
+    private static LocalDate commonKyivScheduleDate = LocalDate.MIN;
 
     private static byte[] commonRegionsSchedule;
-    private static LocalDateTime commonRegionsScheduleDate = LocalDateTime.MIN;
+    private static LocalDate commonRegionsScheduleDate = LocalDate.MIN;
 
     private final ScheduleService scheduleService;
 
@@ -54,20 +54,20 @@ public class CommonScheduleHandler extends AbstractHandler {
         if (COMMON_KYIV_COMMAND.equals(session.getText())) {
             if (isNotValid(commonKyivSchedule, commonKyivScheduleDate)) {
                 commonKyivSchedule = scheduleService.getCommonScheduleScreenshot(session, KYIV);
-                commonKyivScheduleDate = LocalDateTime.now();
+                commonKyivScheduleDate = LocalDate.now();
             }
 
             screenshot = commonKyivSchedule;
         } else {
             if (isNotValid(commonRegionsSchedule, commonRegionsScheduleDate)) {
                 commonRegionsSchedule = scheduleService.getCommonScheduleScreenshot(session, REGION);
-                commonRegionsScheduleDate = LocalDateTime.now();
+                commonRegionsScheduleDate = LocalDate.now();
             }
 
             screenshot = commonRegionsSchedule;
         }
 
-        String fileName = String.format(FILE_NAME_FORMAT, LocalDateTime.now());
+        String fileName = String.format(FILE_NAME_FORMAT, LocalDate.now());
         InputFile file = new InputFile(new ByteArrayInputStream(screenshot), fileName);
 
         SendPhoto photo = SendPhoto.builder()
@@ -88,8 +88,7 @@ public class CommonScheduleHandler extends AbstractHandler {
         }
     }
 
-    private static boolean isNotValid(byte[] screenshot, LocalDateTime dateTime) {
-        return screenshot == null || screenshot.length == 0 || dateTime == null ||
-            (dateTime.isBefore(LocalDateTime.now()) && (dateTime.getHour() - LocalDateTime.now().getHour()) < -6);
+    private static boolean isNotValid(byte[] screenshot, LocalDate date) {
+        return screenshot == null || screenshot.length == 0 || date == null || !date.isEqual(LocalDate.now());
     }
 }
