@@ -15,6 +15,7 @@ import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_COMMON
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_AUTOCOMPLETE;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_AUTOCOMPLETE_LIST;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_HOUSE_INPUT;
+import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_MODAL_WINDOW;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_SCHEDULE_TABLE;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_SHUTDOWN_STATUS;
 import static org.bot.telegram.blackout_alerts.util.BrowserPageUtil.XPATH_STREET_AUTOCOMPLETE;
@@ -41,11 +42,15 @@ import org.bot.telegram.blackout_alerts.model.session.UserSession;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Service;
 
@@ -116,6 +121,12 @@ public class BrowserInteractionService {
         byte[] screenshotBytes;
         try {
             screenshotBytes = getScreenshotOfElementLocated(XPATH_COMMON_SCHEDULE_IMG);
+        } catch (NoSuchElementException e) {
+            log.warn("Common schedule image not found. Getting modal screenshot");
+            driver.navigate().refresh();
+            pageAwait.until(ExpectedConditions.elementToBeClickable(By.xpath(XPATH_CLOSE_MODAL_BTN)));
+
+            screenshotBytes = getScreenshotOfElementLocated(XPATH_MODAL_WINDOW);
         } finally {
             releaseWebDriverWithAwaits(this);
         }

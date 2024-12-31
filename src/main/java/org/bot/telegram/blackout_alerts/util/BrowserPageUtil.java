@@ -40,6 +40,9 @@ public class BrowserPageUtil {
     public static final String XPATH_SCHEDULE_TABLE = "//div[contains(@class,'discon-schedule-table')]//table";
     public static final String XPATH_COMMON_SCHEDULE_IMG = "//section//picture/img";
 
+    public static final String XPATH_MODAL_WINDOW =
+        "//div[@id='modal-attention']//div[contains(@class,'modal__container')]";
+
     public static final String XPATH_SHUTDOWN_STATUS = "//div[@id='showCurOutage']/p";
 
     public static final String JS_GET_SCHEDULE = "return JSON.stringify(DisconSchedule.preset[\"data\"]);";

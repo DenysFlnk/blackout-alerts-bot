@@ -53,6 +53,7 @@ public class CommonScheduleHandler extends AbstractHandler {
         byte[] screenshot;
         if (COMMON_KYIV_COMMAND.equals(session.getText())) {
             if (isNotValid(commonKyivSchedule, commonKyivScheduleDate)) {
+                sendScheduleLoadingMessage(session);
                 commonKyivSchedule = scheduleService.getCommonScheduleScreenshot(session, KYIV);
                 commonKyivScheduleDate = LocalDate.now();
             }
@@ -60,6 +61,7 @@ public class CommonScheduleHandler extends AbstractHandler {
             screenshot = commonKyivSchedule;
         } else {
             if (isNotValid(commonRegionsSchedule, commonRegionsScheduleDate)) {
+                sendScheduleLoadingMessage(session);
                 commonRegionsSchedule = scheduleService.getCommonScheduleScreenshot(session, REGION);
                 commonRegionsScheduleDate = LocalDate.now();
             }
